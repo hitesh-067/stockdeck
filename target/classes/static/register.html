@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - StockDeck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="brand">StockDeck</a>
+        <div class="links">
+            <a href="index.html">Home</a>
+            <a href="login.html" class="btn btn-primary" style="color: white; margin-left: 1rem;">Login</a>
+            <button id="theme-toggle" class="theme-toggle">☀️</button>
+        </div>
+    </nav>
+
+    <main>
+        <div class="glass-panel form-container">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Create Account</h2>
+            <div id="alertBox" class="alert"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+            </form>
+            <p style="margin-top: 1.5rem; text-align: center; opacity: 0.8;">
+                Already have an account? <a href="login.html" style="color: var(--primary-color);">Login here</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="js/theme.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const alertBox = document.getElementById('alertBox');
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    alertBox.className = 'alert success';
+                    alertBox.textContent = 'Registration successful! Redirecting to login...';
+                    setTimeout(() => window.location.href = 'login.html', 1500);
+                } else {
+                    alertBox.className = 'alert error';
+                    alertBox.textContent = data.error || 'Registration failed.';
+                }
+            } catch (err) {
+                alertBox.className = 'alert error';
+                alertBox.textContent = 'Server error. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>

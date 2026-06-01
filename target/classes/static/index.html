@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Profit Maximization System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="brand">StockDeck</a>
+        <div class="links">
+            <a href="index.html">Home</a>
+            <a href="login.html" class="btn btn-primary" style="color: white; margin-left: 1rem;">Login</a>
+            <a href="register.html" class="btn btn-success" style="color: white; margin-left: 0.5rem;">Register</a>
+            <button id="theme-toggle" class="theme-toggle">☀️</button>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-content">
+            <h1>Stock Profit Maximization System</h1>
+            <p>Analyze stock profits using Dynamic Programming and advanced analytics. Experience a premium trading platform inspired by the best in fintech.</p>
+            <div>
+                <a href="login.html" class="btn btn-primary">Login to Dashboard</a>
+                <a href="register.html" class="btn btn-success">Create Account</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <!-- Premium Wall Street Bull Image -->
+            <img src="img/bull.png" alt="Wall Street Charging Bull" />
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section style="padding: 4rem 2rem; max-width: 1200px; margin: 0 auto;">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Platform Features</h2>
+        <div class="stats-grid">
+            <div class="glass-panel stat-card">
+                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">Profit Calculation</h3>
+                <p>Instantly calculate your stock profits and losses with our accurate tools.</p>
+            </div>
+            <div class="glass-panel stat-card">
+                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent-color);">Dynamic Programming</h3>
+                <p>Utilize DAA to find the optimal buy and sell days for maximum profit.</p>
+            </div>
+            <div class="glass-panel stat-card">
+                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--danger-color);">Analytics Dashboard</h3>
+                <p>Visualize your trading performance with interactive charts.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 2rem; opacity: 0.7;">
+        Stock Profit Maximization System &copy; 2026
+    </footer>
+
+    <script src="js/theme.js"></script>
+    <script>
+        // Redirect to dashboard if already logged in
+        if (localStorage.getItem('userId')) {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

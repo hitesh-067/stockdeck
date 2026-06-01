@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - StockDeck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="brand">StockDeck</a>
+        <div class="links">
+            <a href="index.html">Home</a>
+            <a href="register.html" class="btn btn-success" style="color: white; margin-left: 1rem;">Register</a>
+            <button id="theme-toggle" class="theme-toggle">☀️</button>
+        </div>
+    </nav>
+
+    <main>
+        <div class="glass-panel form-container">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Welcome Back</h2>
+            <div id="alertBox" class="alert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+            <p style="margin-top: 1.5rem; text-align: center; opacity: 0.8;">
+                Don't have an account? <a href="register.html" style="color: var(--accent-color);">Register here</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="js/theme.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const alertBox = document.getElementById('alertBox');
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('userId', data.userId);
+                    localStorage.setItem('username', data.username);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alertBox.className = 'alert error';
+                    alertBox.textContent = data.error || 'Login failed.';
+                }
+            } catch (err) {
+                alertBox.className = 'alert error';
+                alertBox.textContent = 'Server error. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>

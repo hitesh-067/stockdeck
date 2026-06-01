@@ -1,0 +1,15 @@
+com\stockdeck\service\CalculationService.class
+com\stockdeck\dto\LoginRequest.class
+com\stockdeck\StockdeckApplication.class
+com\stockdeck\controller\AuthController.class
+com\stockdeck\dto\DashboardStats.class
+com\stockdeck\service\AuthService.class
+com\stockdeck\dto\CalculationRequest.class
+com\stockdeck\dto\StrategyRequest.class
+com\stockdeck\model\Calculation.class
+com\stockdeck\dto\StrategyResponse.class
+com\stockdeck\model\User.class
+com\stockdeck\repository\CalculationRepository.class
+com\stockdeck\repository\UserRepository.class
+com\stockdeck\controller\StrategyController.class
+com\stockdeck\controller\CalculationController.class
