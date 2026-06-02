@@ -6,8 +6,8 @@
     <title>History - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=3">
-</head>
-<body>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <nav class="topbar">
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
@@ -28,7 +28,10 @@
         <main class="main-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <h2 style="font-size: 2rem; letter-spacing: -0.02em;">Transaction History</h2>
-                <button id="clearHistoryBtn" class="btn btn-danger">Clear History</button>
+                <div>
+                    <button id="exportCsvBtn" class="btn btn-primary" style="margin-right: 0.5rem;">📥 Export to CSV</button>
+                    <button id="clearHistoryBtn" class="btn btn-danger">🗑️ Clear History</button>
+                </div>
             </div>
             
             <div class="table-container">
@@ -51,16 +54,30 @@
         </main>
     </div>
 
+    <!-- jQuery & DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    
     <script src="js/theme.js"></script>
+    <script src="js/toast.js"></script>
     <script>
         const userId = localStorage.getItem('userId');
         if (!userId) window.location.href = 'login.html';
 
+        let dataTable;
+
         async function fetchHistory() {
             try {
+                const tbody = document.querySelector('#historyTable tbody');
+                tbody.innerHTML = '<tr><td colspan="6" class="skeleton" style="height: 40px; margin-bottom: 5px;">Loading</td></tr><tr><td colspan="6" class="skeleton" style="height: 40px;">Loading</td></tr>';
+
                 const res = await fetch(`/api/calculations/history/${userId}`);
                 const history = await res.json();
-                const tbody = document.querySelector('#historyTable tbody');
+                
+                if (dataTable) {
+                    dataTable.destroy();
+                }
+                
                 tbody.innerHTML = '';
 
                 if (history.length === 0) {
@@ -78,13 +95,27 @@
                         <td>₹${item.buyPrice.toFixed(2)}</td>
                         <td>₹${item.sellPrice.toFixed(2)}</td>
                         <td>${item.quantity}</td>
-                        <td style="color: ${profitColor}; font-weight: 600;">₹${item.profit.toFixed(2)}</td>
+                        <td style="color: ${profitColor}; font-weight: 600;" data-order="${item.profit}">₹${item.profit.toFixed(2)}</td>
                         <td><button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="deleteRecord(${item.id})">Delete</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // Initialize DataTables
+                dataTable = $('#historyTable').DataTable({
+                    pageLength: 10,
+                    lengthChange: false,
+                    info: true,
+                    searching: true,
+                    order: [[4, 'desc']], // Default sort by highest profit
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search records..."
+                    }
+                });
             } catch (err) {
                 console.error('Failed to fetch history', err);
+                showToast('Failed to fetch history', 'error');
             }
         }
 
@@ -92,9 +123,13 @@
             if (!confirm('Are you sure you want to delete this record?')) return;
             try {
                 const res = await fetch(`/api/calculations/${id}`, { method: 'DELETE' });
-                if (res.ok) fetchHistory();
+                if (res.ok) {
+                    showToast('Record deleted.', 'success');
+                    fetchHistory();
+                }
             } catch (err) {
                 console.error('Failed to delete', err);
+                showToast('Failed to delete record', 'error');
             }
         }
 
@@ -102,10 +137,38 @@
             if (!confirm('Are you sure you want to clear ALL history?')) return;
             try {
                 const res = await fetch(`/api/calculations/clear/${userId}`, { method: 'DELETE' });
-                if (res.ok) fetchHistory();
+                if (res.ok) {
+                    showToast('All history cleared!', 'success');
+                    fetchHistory();
+                }
             } catch (err) {
                 console.error('Failed to clear', err);
+                showToast('Failed to clear history', 'error');
             }
+        });
+        
+        // Export to CSV
+        document.getElementById('exportCsvBtn').addEventListener('click', () => {
+            if (!dataTable) return;
+            let csv = 'Stock Name,Buy Price,Sell Price,Quantity,Profit/Loss\n';
+            dataTable.rows().data().toArray().forEach(row => {
+                // Remove ₹ and HTML tags before exporting
+                const cleanRow = row.slice(0, 5).map(cell => {
+                    const text = $('<div>').html(cell).text();
+                    return text.replace(/₹/g, '').replace(/,/g, '');
+                });
+                csv += cleanRow.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'StockDeck_History.csv');
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Exported to CSV!', 'success');
         });
 
         fetchHistory();

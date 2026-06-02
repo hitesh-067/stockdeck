@@ -59,7 +59,14 @@
                     </div>
                 </div>
                 <div class="glass-panel chart-card">
-                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Profit Trend</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0;">Profit Trend</h3>
+                        <div class="chart-filters" style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">1W</button>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">1M</button>
+                            <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">ALL</button>
+                        </div>
+                    </div>
                     <div class="chart-container">
                         <canvas id="lineChart"></canvas>
                     </div>
@@ -69,6 +76,7 @@
     </div>
 
     <script src="js/theme.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

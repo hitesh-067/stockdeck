@@ -16,12 +16,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     let doughnutChart, lineChart;
+    let fullHistoryData = []; // Store full history for filtering
 
     async function fetchStats() {
         try {
+            // Apply skeletons
+            ['stat-calcs', 'stat-profit', 'stat-loss', 'stat-top-stock'].forEach(id => {
+                document.getElementById(id).classList.add('skeleton');
+            });
+
             const res = await fetch(`/api/calculations/dashboard/stats/${userId}`);
             const stats = await res.json();
 
+            // Remove skeletons
+            ['stat-calcs', 'stat-profit', 'stat-loss', 'stat-top-stock'].forEach(id => {
+                document.getElementById(id).classList.remove('skeleton');
+            });
+            
             document.getElementById('stat-calcs').textContent = stats.totalCalculations;
             document.getElementById('stat-profit').textContent = `₹${stats.totalProfit.toFixed(2)}`;
             document.getElementById('stat-loss').textContent = `₹${stats.totalLoss.toFixed(2)}`;
@@ -37,11 +48,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Fetch history for trend chart
             const histRes = await fetch(`/api/calculations/history/${userId}`);
-            const history = await histRes.json();
-            renderLineChart(history);
+            fullHistoryData = await histRes.json();
+            renderLineChart(fullHistoryData);
 
         } catch (err) {
             console.error('Failed to load dashboard stats', err);
+            if(window.showToast) showToast('Failed to load dashboard stats', 'error');
         }
     }
 
@@ -130,6 +142,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Re-render charts on theme change to update text colors
     window.addEventListener('themeChanged', () => {
         fetchStats();
+    });
+
+    // Setup chart filters
+    const filterBtns = document.querySelectorAll('.chart-filters button');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Update active state
+            filterBtns.forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline');
+            });
+            e.target.classList.remove('btn-outline');
+            e.target.classList.add('btn-primary');
+
+            // Filter data (mock time filtering by slicing latest trades)
+            const type = e.target.textContent;
+            let filteredData = [...fullHistoryData];
+            
+            if (type === '1W') {
+                // Mock 1 week = last 5 trades
+                filteredData = filteredData.slice(0, 5);
+            } else if (type === '1M') {
+                // Mock 1 month = last 20 trades
+                filteredData = filteredData.slice(0, 20);
+            }
+            
+            renderLineChart(filteredData);
+        });
     });
 
     fetchStats();
