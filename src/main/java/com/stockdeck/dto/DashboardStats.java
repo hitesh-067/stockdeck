@@ -7,6 +7,7 @@ public class DashboardStats {
     private double netProfit;
     private String topStockName;
     private double topStockProfit;
+    private double winRate;
 
     public DashboardStats() {}
 
@@ -27,4 +28,7 @@ public class DashboardStats {
 
     public double getTopStockProfit() { return topStockProfit; }
     public void setTopStockProfit(double topStockProfit) { this.topStockProfit = topStockProfit; }
+
+    public double getWinRate() { return winRate; }
+    public void setWinRate(double winRate) { this.winRate = winRate; }
 }

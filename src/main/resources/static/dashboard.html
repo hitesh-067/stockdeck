@@ -28,47 +28,98 @@
             </ul>
         </aside>
 
-        <main class="main-content">
-            <h2 style="margin-bottom: 0.5rem;">Welcome back, <span id="welcome-name"></span>! 👋</h2>
+        <main class="main-content" style="padding-top: 0;">
+            <!-- TradingView Ticker Tape Widget -->
+            <div class="tradingview-widget-container" style="margin-bottom: 2rem;">
+              <div class="tradingview-widget-container__widget"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+              {
+              "symbols": [
+                { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+                { "proName": "FOREXCOM:NSXUSD", "title": "US 100" },
+                { "description": "Apple", "proName": "NASDAQ:AAPL" },
+                { "description": "Tesla", "proName": "NASDAQ:TSLA" },
+                { "description": "Nvidia", "proName": "NASDAQ:NVDA" },
+                { "description": "Bitcoin", "proName": "BITSTAMP:BTCUSD" }
+              ],
+              "showSymbolLogo": true,
+              "isTransparent": true,
+              "displayMode": "adaptive",
+              "colorTheme": "dark",
+              "locale": "en"
+            }
+              </script>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; padding: 0 1rem;">
+                <h2 style="font-size: 2rem; letter-spacing: -0.02em;">Welcome back, <span id="welcome-name" style="color: var(--primary-color);"></span>! 👋</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="calculator.html" class="btn btn-primary" style="text-decoration: none;">➕ New Trade</a>
+                    <a href="strategy.html" class="btn btn-outline" style="text-decoration: none;">🧠 Analyze</a>
+                </div>
+            </div>
             
             <div class="stats-grid">
-                <div class="glass-panel stat-card">
-                    <h3>Total Calculations</h3>
-                    <div class="value" id="stat-calcs">0</div>
+                <div class="glass-panel stat-card" style="border-top: 4px solid var(--primary-color); position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.05; pointer-events: none;">🎯</div>
+                    <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Win Rate</h3>
+                    <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                        <p id="stat-winrate" style="font-size: 2.2rem; font-weight: 700; margin: 0;">0%</p>
+                        <span id="stat-calcs" style="font-size: 0.9rem; opacity: 0.6;">(0 trades)</span>
+                    </div>
+                    <div style="width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; margin-top: 1rem; overflow: hidden;">
+                        <div id="winrate-bar" style="height: 100%; background: var(--primary-color); width: 0%; transition: width 1s ease-in-out;"></div>
+                    </div>
                 </div>
-                <div class="glass-panel stat-card">
-                    <h3>Total Profit</h3>
-                    <div class="value" id="stat-profit" style="color: var(--accent-color);">₹0</div>
+                <div class="glass-panel stat-card" style="border-top: 4px solid var(--accent-color); position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: 0; bottom: -10px; font-size: 5rem; opacity: 0.05; pointer-events: none;">📈</div>
+                    <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Total Profit</h3>
+                    <p id="stat-profit" style="font-size: 2.2rem; font-weight: 700; color: var(--accent-color); margin: 0;">₹0.00</p>
                 </div>
-                <div class="glass-panel stat-card">
-                    <h3>Total Loss</h3>
-                    <div class="value" id="stat-loss" style="color: var(--danger-color);">₹0</div>
+                <div class="glass-panel stat-card" style="border-top: 4px solid var(--danger-color); position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: 0; bottom: -10px; font-size: 5rem; opacity: 0.05; pointer-events: none;">📉</div>
+                    <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Total Loss</h3>
+                    <p id="stat-loss" style="font-size: 2.2rem; font-weight: 700; color: var(--danger-color); margin: 0;">₹0.00</p>
                 </div>
-                <div class="glass-panel stat-card">
-                    <h3>Top Stock</h3>
-                    <div class="value" id="stat-top-stock" style="font-size: 1.5rem;">N/A</div>
-                    <div style="font-size: 0.9rem; color: var(--accent-color);" id="stat-top-profit"></div>
+                <div class="glass-panel stat-card" style="border-top: 4px solid #a855f7; position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: 10px; bottom: -10px; font-size: 5rem; opacity: 0.05; pointer-events: none;">🏆</div>
+                    <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Top Stock</h3>
+                    <p id="stat-top-stock" style="font-size: 2.2rem; font-weight: 700; margin: 0;">N/A</p>
+                    <p id="stat-top-profit" style="color: var(--accent-color); font-weight: 600; margin-top: 0.25rem; font-size: 0.9rem;"></p>
                 </div>
             </div>
 
-            <div class="charts-grid">
-                <div class="glass-panel chart-card">
-                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Profit / Loss Distribution</h3>
-                    <div class="chart-container">
-                        <canvas id="doughnutChart"></canvas>
-                    </div>
-                </div>
-                <div class="glass-panel chart-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <h3 style="margin: 0;">Profit Trend</h3>
-                        <div class="chart-filters" style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">1W</button>
-                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">1M</button>
-                            <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">ALL</button>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                <div class="charts-grid" style="grid-template-columns: 1fr; margin-top: 0;">
+                    <div class="glass-panel chart-card" style="padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1.5rem; text-align: center;">Profit / Loss Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="doughnutChart"></canvas>
                         </div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="lineChart"></canvas>
+                    
+                    <div class="glass-panel chart-card" style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 style="margin: 0;">Profit Trend</h3>
+                            <div class="chart-filters" style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">1W</button>
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">1M</button>
+                                <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">ALL</button>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding: 1.5rem; border-radius: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0;">Recent Activity</h3>
+                        <a href="history.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">View All</a>
+                    </div>
+                    <div id="activity-feed" class="activity-feed">
+                        <!-- Filled by JS -->
                     </div>
                 </div>
             </div>

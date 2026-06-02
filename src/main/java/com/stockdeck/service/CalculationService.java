@@ -61,10 +61,12 @@ public class CalculationService {
         double totalLoss = 0;
         double maxProfit = Double.NEGATIVE_INFINITY;
         String topStock = "None";
+        int profitableTrades = 0;
 
         for (Calculation c : history) {
             if (c.getProfit() >= 0) {
                 totalProfit += c.getProfit();
+                profitableTrades++;
             } else {
                 totalLoss += Math.abs(c.getProfit());
             }
@@ -85,6 +87,12 @@ public class CalculationService {
         } else {
             stats.setTopStockName("N/A");
             stats.setTopStockProfit(0);
+        }
+
+        if (history.size() > 0) {
+            stats.setWinRate(((double) profitableTrades / history.size()) * 100.0);
+        } else {
+            stats.setWinRate(0.0);
         }
 
         return stats;
