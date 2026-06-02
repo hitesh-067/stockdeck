@@ -1,6 +1,9 @@
 package com.stockdeck.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,9 +19,12 @@ public class StockApiController {
     @GetMapping("/quote/{ticker}")
     public ResponseEntity<?> getStockQuote(@PathVariable String ticker) {
         try {
-            // Using Yahoo Finance public API
             String url = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker.toUpperCase();
-            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<Map> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            Map<String, Object> response = responseEntity.getBody();
             
             if (response != null && response.containsKey("chart")) {
                 Map<String, Object> chart = (Map<String, Object>) response.get("chart");
@@ -42,7 +48,11 @@ public class StockApiController {
             @RequestParam(defaultValue = "1mo") String range) {
         try {
             String url = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker.toUpperCase() + "?range=" + range + "&interval=1d";
-            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<Map> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            Map<String, Object> response = responseEntity.getBody();
             
             if (response != null && response.containsKey("chart")) {
                 Map<String, Object> chart = (Map<String, Object>) response.get("chart");
