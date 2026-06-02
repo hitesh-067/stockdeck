@@ -1,132 +1,251 @@
-let strategyChart;
+document.addEventListener('DOMContentLoaded', () => {
+    let strategyChart;
+    let currentMode = 'live'; // 'live' or 'manual'
 
-document.getElementById('strategyForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const pricesInput = document.getElementById('prices').value;
-    const alertBox = document.getElementById('alertBox');
+    // UI Elements
+    const modeLiveBtn = document.getElementById('modeLiveBtn');
+    const modeManualBtn = document.getElementById('modeManualBtn');
+    const inputLive = document.getElementById('inputLive');
+    const inputManual = document.getElementById('inputManual');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const algorithmSelect = document.getElementById('algorithm');
     
-    // parse input
-    const pricesStr = pricesInput.split(',').map(s => s.trim());
-    const prices = pricesStr.map(s => parseFloat(s)).filter(n => !isNaN(n));
-    
-    if (prices.length < 2) {
-        alertBox.className = 'alert error';
-        alertBox.textContent = 'Please provide at least two valid numerical prices.';
-        return;
-    }
-    
-    alertBox.style.display = 'none';
+    // Toggle Modes
+    modeLiveBtn.addEventListener('click', () => {
+        currentMode = 'live';
+        modeLiveBtn.classList.replace('btn-outline', 'btn-primary');
+        modeManualBtn.classList.replace('btn-primary', 'btn-outline');
+        inputLive.style.display = 'block';
+        inputManual.style.display = 'none';
+    });
 
-    try {
-        const res = await fetch('/api/max-profit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prices })
-        });
-        
-        const data = await res.json();
-        
-        if (res.ok) {
-            document.getElementById('resultSection').style.display = 'block';
-            
-            if (data.profit > 0) {
-                document.getElementById('resBuy').textContent = `Day ${data.buyDay}`;
-                document.getElementById('resSell').textContent = `Day ${data.sellDay}`;
-                document.getElementById('resProfit').textContent = `₹${data.profit.toFixed(2)}`;
+    modeManualBtn.addEventListener('click', () => {
+        currentMode = 'manual';
+        modeManualBtn.classList.replace('btn-outline', 'btn-primary');
+        modeLiveBtn.classList.replace('btn-primary', 'btn-outline');
+        inputManual.style.display = 'block';
+        inputLive.style.display = 'none';
+    });
+
+    document.getElementById('strategyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        analyzeBtn.textContent = 'Analyzing...';
+        analyzeBtn.disabled = true;
+
+        try {
+            let prices = [];
+            let labels = [];
+
+            if (currentMode === 'live') {
+                const ticker = document.getElementById('ticker').value.trim();
+                if (!ticker) {
+                    showToast('Please enter a stock ticker', 'error');
+                    throw new Error('No ticker');
+                }
+                
+                const res = await fetch(`/api/stock/history/${ticker}?range=1mo`);
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    showToast(data.error || 'Failed to fetch live data', 'error');
+                    throw new Error('API Error');
+                }
+
+                prices = data.prices;
+                // Convert unix timestamps to readable dates for labels
+                labels = data.timestamps.map(ts => {
+                    const d = new Date(ts * 1000);
+                    return `${d.getMonth()+1}/${d.getDate()}`;
+                });
+                
+                showToast(`Loaded 30-day history for ${data.symbol}`, 'success');
+
             } else {
-                document.getElementById('resBuy').textContent = `No Buy`;
-                document.getElementById('resSell').textContent = `No Sell`;
-                document.getElementById('resProfit').textContent = `₹0.00`;
+                const pricesInput = document.getElementById('prices').value;
+                prices = pricesInput.split(',').map(p => parseFloat(p.trim())).filter(p => !isNaN(p));
+                if (prices.length < 2) {
+                    showToast('Please enter at least 2 valid prices.', 'error');
+                    throw new Error('Invalid input');
+                }
+                labels = prices.map((_, i) => `Day ${i + 1}`);
+            }
+
+            // Run chosen algorithm
+            const algo = algorithmSelect.value;
+            let result;
+            
+            if (algo === 'single') {
+                result = runSingleTradeAlgorithm(prices);
+            } else {
+                result = runMultipleTradesAlgorithm(prices);
+            }
+
+            updateUI(result, prices, labels);
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            analyzeBtn.textContent = 'Run Analysis';
+            analyzeBtn.disabled = false;
+        }
+    });
+
+    function runSingleTradeAlgorithm(prices) {
+        if (!prices || prices.length < 2) return null;
+        
+        let minPrice = prices[0];
+        let minIdx = 0;
+        
+        let maxProfit = 0;
+        let bestBuyIdx = 0;
+        let bestSellIdx = 0;
+
+        for (let i = 1; i < prices.length; i++) {
+            let currentProfit = prices[i] - minPrice;
+            if (currentProfit > maxProfit) {
+                maxProfit = currentProfit;
+                bestBuyIdx = minIdx;
+                bestSellIdx = i;
+            }
+            if (prices[i] < minPrice) {
+                minPrice = prices[i];
+                minIdx = i;
+            }
+        }
+        
+        return {
+            maxProfit,
+            buyIndices: maxProfit > 0 ? [bestBuyIdx] : [],
+            sellIndices: maxProfit > 0 ? [bestSellIdx] : [],
+            type: 'single'
+        };
+    }
+
+    function runMultipleTradesAlgorithm(prices) {
+        if (!prices || prices.length < 2) return null;
+
+        let maxProfit = 0;
+        let buyIndices = [];
+        let sellIndices = [];
+
+        for (let i = 1; i < prices.length; i++) {
+            if (prices[i] > prices[i - 1]) {
+                maxProfit += (prices[i] - prices[i - 1]);
+                buyIndices.push(i - 1);
+                sellIndices.push(i);
+            }
+        }
+
+        return {
+            maxProfit,
+            buyIndices,
+            sellIndices,
+            type: 'multiple'
+        };
+    }
+
+    function updateUI(result, prices, labels) {
+        document.getElementById('resultSection').style.display = 'block';
+        
+        if (result.maxProfit > 0) {
+            if (result.type === 'single') {
+                document.getElementById('resBuy').textContent = labels[result.buyIndices[0]];
+                document.getElementById('resSell').textContent = labels[result.sellIndices[0]];
+            } else {
+                document.getElementById('resBuy').textContent = `${result.buyIndices.length} Trades`;
+                document.getElementById('resSell').textContent = `Multiple`;
             }
             
-            renderStrategyChart(prices, data.buyDay, data.sellDay);
+            document.getElementById('resProfit').textContent = `₹${result.maxProfit.toFixed(2)}`;
+            
+            // Calculate ROI
+            // For single trade: (Profit / BuyPrice) * 100
+            // For multiple: (Total Profit / Avg Buy Price or Starting Capital)
+            // Let's use simplified starting capital = first buy price for single, or total initial capital.
+            let investment = result.type === 'single' ? prices[result.buyIndices[0]] : prices[0];
+            let roi = (result.maxProfit / investment) * 100;
+            document.getElementById('resROI').textContent = `+${roi.toFixed(1)}%`;
+            
         } else {
-            alertBox.className = 'alert error';
-            alertBox.textContent = data.error || 'Analysis failed.';
-            alertBox.style.display = 'block';
+            document.getElementById('resBuy').textContent = 'None';
+            document.getElementById('resSell').textContent = 'None';
+            document.getElementById('resProfit').textContent = '₹0';
+            document.getElementById('resROI').textContent = '0%';
         }
-    } catch (err) {
-        alertBox.className = 'alert error';
-        alertBox.textContent = 'Server error. Please try again.';
-        alertBox.style.display = 'block';
+
+        renderChart(prices, labels, result.buyIndices, result.sellIndices);
     }
-});
 
-function renderStrategyChart(prices, buyDay, sellDay) {
-    const ctx = document.getElementById('strategyChart').getContext('2d');
-    if (strategyChart) strategyChart.destroy();
+    function renderChart(prices, labels, buyIndices, sellIndices) {
+        const ctx = document.getElementById('strategyChart').getContext('2d');
+        if (strategyChart) strategyChart.destroy();
 
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textColor = isDark ? '#f8fafc' : '#111827';
-    const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDark ? '#f8fafc' : '#111827';
+        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-    const labels = prices.map((_, i) => `Day ${i + 1}`);
-    
-    // Highlight points
-    const pointBackgroundColors = prices.map((_, i) => {
-        const day = i + 1;
-        if (day === buyDay) return '#10b981'; // accent color (greenish)
-        if (day === sellDay) return '#ef4444'; // danger color (reddish)
-        return '#3b82f6'; // default primary
-    });
-    
-    const pointRadii = prices.map((_, i) => {
-        const day = i + 1;
-        if (day === buyDay || day === sellDay) return 8;
-        return 4;
-    });
+        // Create point styles: green for buy, red for sell, invisible for normal
+        const pointColors = prices.map((_, i) => {
+            if (buyIndices.includes(i)) return '#10b981'; // Green
+            if (sellIndices.includes(i)) return '#ef4444'; // Red
+            return 'rgba(0,0,0,0)'; // Transparent
+        });
+        
+        const pointRadii = prices.map((_, i) => {
+            if (buyIndices.includes(i) || sellIndices.includes(i)) return 6;
+            return 0;
+        });
 
-    strategyChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Stock Price (₹)',
-                data: prices,
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                fill: true,
-                tension: 0.2,
-                pointBackgroundColor: pointBackgroundColors,
-                pointRadius: pointRadii,
-                pointHoverRadius: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    ticks: { color: textColor },
-                    grid: { color: gridColor }
-                },
-                y: {
-                    ticks: { color: textColor },
-                    grid: { color: gridColor }
-                }
+        strategyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Stock Price',
+                    data: prices,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.2,
+                    pointBackgroundColor: pointColors,
+                    pointBorderColor: pointColors,
+                    pointRadius: pointRadii,
+                    pointHoverRadius: 8
+                }]
             },
-            plugins: {
-                legend: {
-                    labels: { color: textColor }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
+                plugins: {
+                    legend: { labels: { color: textColor } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = `Price: ₹${context.parsed.y.toFixed(2)}`;
+                                if (buyIndices.includes(context.dataIndex)) label += ' (BUY)';
+                                if (sellIndices.includes(context.dataIndex)) label += ' (SELL)';
+                                return label;
                             }
-                            if (context.parsed.y !== null) {
-                                label += '₹' + context.parsed.y;
-                            }
-                            const day = context.dataIndex + 1;
-                            if (day === buyDay) label += ' (BUY)';
-                            if (day === sellDay) label += ' (SELL)';
-                            return label;
                         }
                     }
                 }
             }
+        });
+    }
+
+    // Re-render chart on theme change to update colors
+    window.addEventListener('themeChanged', () => {
+        if (strategyChart) {
+            // Need to trigger a re-analysis visually, or simply re-assign colors
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if(analyzeBtn && !analyzeBtn.disabled) {
+               document.getElementById('strategyForm').dispatchEvent(new Event('submit'));
+            }
         }
     });
-}
+});

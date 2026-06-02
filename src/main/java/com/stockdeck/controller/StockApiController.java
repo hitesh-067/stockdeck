@@ -35,4 +35,37 @@ public class StockApiController {
             return ResponseEntity.badRequest().body(Map.of("error", "Failed to fetch stock data"));
         }
     }
+
+    @GetMapping("/history/{ticker}")
+    public ResponseEntity<?> getStockHistory(
+            @PathVariable String ticker, 
+            @RequestParam(defaultValue = "1mo") String range) {
+        try {
+            String url = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker.toUpperCase() + "?range=" + range + "&interval=1d";
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            
+            if (response != null && response.containsKey("chart")) {
+                Map<String, Object> chart = (Map<String, Object>) response.get("chart");
+                java.util.List<Map<String, Object>> result = (java.util.List<Map<String, Object>>) chart.get("result");
+                
+                if (result != null && !result.isEmpty()) {
+                    Map<String, Object> resultData = result.get(0);
+                    java.util.List<Integer> timestamp = (java.util.List<Integer>) resultData.get("timestamp");
+                    
+                    Map<String, Object> indicators = (Map<String, Object>) resultData.get("indicators");
+                    java.util.List<Map<String, Object>> quote = (java.util.List<Map<String, Object>>) indicators.get("quote");
+                    java.util.List<Double> close = (java.util.List<Double>) quote.get(0).get("close");
+                    
+                    return ResponseEntity.ok(Map.of(
+                        "symbol", ticker.toUpperCase(),
+                        "timestamps", timestamp,
+                        "prices", close
+                    ));
+                }
+            }
+            return ResponseEntity.badRequest().body(Map.of("error", "Stock not found"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to fetch stock history"));
+        }
+    }
 }

@@ -34,12 +34,31 @@
                 <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px;">
                     <h3 style="margin-bottom: 1rem;">Input Price Sequence</h3>
                     <div id="alertBox" class="alert"></div>
+                    
+                    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                        <button id="modeLiveBtn" class="btn btn-primary" style="flex: 1;">🌐 Live Ticker (Pro)</button>
+                        <button id="modeManualBtn" class="btn btn-outline" style="flex: 1;">✍️ Manual Input</button>
+                    </div>
+
                     <form id="strategyForm">
-                        <div class="form-group">
-                            <label for="prices">Enter Prices (comma separated)</label>
-                            <input type="text" id="prices" placeholder="e.g. 7, 1, 5, 3, 6, 4, 8, 2, 10" required>
+                        <div class="form-group" id="inputLive">
+                            <label for="ticker">Stock Ticker</label>
+                            <input type="text" id="ticker" placeholder="e.g. AAPL, TSLA" style="text-transform: uppercase;">
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Analyze Strategy</button>
+                        <div class="form-group" id="inputManual" style="display: none;">
+                            <label for="prices">Enter Prices (comma separated)</label>
+                            <input type="text" id="prices" placeholder="e.g. 7, 1, 5, 3, 6, 4, 8, 2, 10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="algorithm">Select Algorithm</label>
+                            <select id="algorithm" style="width: 100%; padding: 0.85rem; border-radius: 8px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
+                                <option value="single">Single Trade (Find Max Profit)</option>
+                                <option value="multiple">Multiple Trades (Peak & Valley)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary" style="width: 100%;">Run Analysis</button>
                     </form>
                     
                     <div id="algoInfo" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--card-border);">
@@ -56,7 +75,7 @@
                 <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: none;" id="resultSection">
                     <h3 style="margin-bottom: 1.5rem; text-align: center;">Results & Recommendation</h3>
                     
-                    <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; text-align: center;">
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; text-align: center; flex-wrap: wrap; gap: 1rem;">
                         <div>
                             <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">BUY SIGNAL</div>
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-color);" id="resBuy">Day -</div>
@@ -69,6 +88,10 @@
                             <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">MAXIMUM PROFIT</div>
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);" id="resProfit">₹0</div>
                         </div>
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">ESTIMATED ROI</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #a855f7;" id="resROI">0%</div>
+                        </div>
                     </div>
                     
                     <div style="height: 300px; position: relative;">
@@ -80,6 +103,7 @@
     </div>
 
     <script src="js/theme.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/strategy.js"></script>
 </body>
 </html>
