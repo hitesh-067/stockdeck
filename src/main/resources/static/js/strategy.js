@@ -5,24 +5,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // UI Elements
     const modeLiveBtn = document.getElementById('modeLiveBtn');
     const modeManualBtn = document.getElementById('modeManualBtn');
+    const segmentHighlight = document.getElementById('segment-highlight');
     const inputLive = document.getElementById('inputLive');
     const inputManual = document.getElementById('inputManual');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const algorithmSelect = document.getElementById('algorithm');
     
-    // Toggle Modes
+    // Toggle Modes with Segmented Control
     modeLiveBtn.addEventListener('click', () => {
         currentMode = 'live';
-        modeLiveBtn.classList.replace('btn-outline', 'btn-primary');
-        modeManualBtn.classList.replace('btn-primary', 'btn-outline');
+        modeLiveBtn.classList.add('active');
+        modeManualBtn.classList.remove('active');
+        segmentHighlight.style.transform = 'translateX(0)';
         inputLive.style.display = 'block';
         inputManual.style.display = 'none';
     });
 
     modeManualBtn.addEventListener('click', () => {
         currentMode = 'manual';
-        modeManualBtn.classList.replace('btn-outline', 'btn-primary');
-        modeLiveBtn.classList.replace('btn-primary', 'btn-outline');
+        modeManualBtn.classList.add('active');
+        modeLiveBtn.classList.remove('active');
+        segmentHighlight.style.transform = 'translateX(100%)';
         inputManual.style.display = 'block';
         inputLive.style.display = 'none';
     });
@@ -80,7 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 result = runMultipleTradesAlgorithm(prices);
             }
 
-            updateUI(result, prices, labels);
+            // Hide placeholder, show results
+            document.getElementById('placeholderSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+
+            let tickerOrManual = currentMode === 'live' ? document.getElementById('ticker').value.trim().toUpperCase() : 'your manual input';
+            updateUI(result, prices, labels, tickerOrManual);
 
         } catch (err) {
             console.error(err);
@@ -144,26 +152,23 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function updateUI(result, prices, labels) {
-        document.getElementById('resultSection').style.display = 'block';
+    function updateUI(result, prices, labels, ticker) {
         
         if (result.maxProfit > 0) {
+            let investment = result.type === 'single' ? prices[result.buyIndices[0]] : prices[0];
+            let roi = (result.maxProfit / investment) * 100;
+            
             if (result.type === 'single') {
                 document.getElementById('resBuy').textContent = labels[result.buyIndices[0]];
                 document.getElementById('resSell').textContent = labels[result.sellIndices[0]];
+                document.getElementById('nl-summary').textContent = `The algorithm executed a single trade on ${ticker}, yielding a net profit of ₹${result.maxProfit.toFixed(2)} (${roi.toFixed(1)}% ROI).`;
             } else {
                 document.getElementById('resBuy').textContent = `${result.buyIndices.length} Trades`;
                 document.getElementById('resSell').textContent = `Multiple`;
+                document.getElementById('nl-summary').textContent = `The algorithm executed ${result.buyIndices.length} sequential trades on ${ticker}, yielding a net profit of ₹${result.maxProfit.toFixed(2)} (${roi.toFixed(1)}% ROI).`;
             }
             
             document.getElementById('resProfit').textContent = `₹${result.maxProfit.toFixed(2)}`;
-            
-            // Calculate ROI
-            // For single trade: (Profit / BuyPrice) * 100
-            // For multiple: (Total Profit / Avg Buy Price or Starting Capital)
-            // Let's use simplified starting capital = first buy price for single, or total initial capital.
-            let investment = result.type === 'single' ? prices[result.buyIndices[0]] : prices[0];
-            let roi = (result.maxProfit / investment) * 100;
             document.getElementById('resROI').textContent = `+${roi.toFixed(1)}%`;
             
         } else {
@@ -171,6 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('resSell').textContent = 'None';
             document.getElementById('resProfit').textContent = '₹0';
             document.getElementById('resROI').textContent = '0%';
+            document.getElementById('nl-summary').textContent = `The algorithm could not find any profitable trading opportunities for ${ticker} in this time period.`;
+            document.getElementById('nl-summary').style.color = 'var(--danger-color)';
         }
 
         renderChart(prices, labels, result.buyIndices, result.sellIndices);
