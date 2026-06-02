@@ -4,56 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Profit Maximization System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <!-- Boxicons for modern icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="brand">StockDeck</a>
-        <div class="links">
-            <a href="index.html">Home</a>
-            <a href="login.html" class="btn btn-primary" style="color: white; margin-left: 1rem;">Login</a>
-            <a href="register.html" class="btn btn-success" style="color: white; margin-left: 0.5rem;">Register</a>
-            <button id="theme-toggle" class="theme-toggle">☀️</button>
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <i class='bx bx-trending-up'></i> StockDeck
+            </a>
+            <div class="links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it Works</a>
+                <a href="login.html" class="btn btn-outline" style="margin-left: 1.5rem;">Login</a>
+                <a href="register.html" class="btn btn-primary" style="margin-left: 0.5rem;">Get Started</a>
+                <button id="theme-toggle" class="theme-toggle">☀️</button>
+            </div>
         </div>
     </nav>
 
-    <main class="hero">
-        <div class="hero-content">
-            <h1>Stock Profit Maximization System</h1>
-            <p>Analyze stock profits using Dynamic Programming and advanced analytics. Experience a premium trading platform inspired by the best in fintech.</p>
-            <div>
-                <a href="login.html" class="btn btn-primary">Login to Dashboard</a>
-                <a href="register.html" class="btn btn-success">Create Account</a>
+    <!-- Hero Section -->
+    <main class="hero-section">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="badge">🚀 Next-Gen Trading Analytics</div>
+                <h1>Maximize Your Stock Profits Using <span class="text-gradient">Dynamic Programming</span></h1>
+                <p>Experience a premium trading platform designed to calculate, analyze, and visualize your optimal buy and sell strategies with precision algorithms.</p>
+                <div class="hero-actions">
+                    <a href="register.html" class="btn btn-primary btn-lg">Create Free Account <i class='bx bx-right-arrow-alt'></i></a>
+                    <a href="login.html" class="btn btn-outline btn-lg">Login to Dashboard</a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-num">O(n)</span>
+                        <span class="stat-label">Time Complexity</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">100%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">O(1)</span>
+                        <span class="stat-label">Space Complexity</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="hero-image">
-            <!-- Premium Wall Street Bull Image -->
-            <img src="img/bull.png" alt="Wall Street Charging Bull" />
+            <div class="hero-image-wrapper">
+                <div class="glass-panel image-panel">
+                    <img src="img/bull.png" alt="Wall Street Charging Bull" />
+                </div>
+            </div>
         </div>
     </main>
 
     <!-- Features Section -->
-    <section style="padding: 4rem 2rem; max-width: 1200px; margin: 0 auto;">
-        <h2 style="text-align: center; margin-bottom: 2rem;">Platform Features</h2>
-        <div class="stats-grid">
-            <div class="glass-panel stat-card">
-                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">Profit Calculation</h3>
-                <p>Instantly calculate your stock profits and losses with our accurate tools.</p>
+    <section id="features" class="features-section">
+        <div class="section-header">
+            <h2>Powerful Platform Features</h2>
+            <p>Everything you need to analyze your trades and maximize your portfolio's potential.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="glass-panel feature-card">
+                <div class="feature-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--primary-color);">
+                    <i class='bx bx-calculator'></i>
+                </div>
+                <h3>Profit Calculation</h3>
+                <p>Instantly calculate your stock profits and losses with our accurate tools. Keep a track record of every trade you make.</p>
             </div>
-            <div class="glass-panel stat-card">
-                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent-color);">Dynamic Programming</h3>
-                <p>Utilize DAA to find the optimal buy and sell days for maximum profit.</p>
+            
+            <div class="glass-panel feature-card">
+                <div class="feature-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-color);">
+                    <i class='bx bx-code-alt'></i>
+                </div>
+                <h3>Dynamic Programming</h3>
+                <p>Utilize advanced Design and Analysis of Algorithms (DAA) to find the absolute optimal buy and sell days for maximum profit.</p>
             </div>
-            <div class="glass-panel stat-card">
-                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--danger-color);">Analytics Dashboard</h3>
-                <p>Visualize your trading performance with interactive charts.</p>
+            
+            <div class="glass-panel feature-card">
+                <div class="feature-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color);">
+                    <i class='bx bx-pie-chart-alt-2'></i>
+                </div>
+                <h3>Analytics Dashboard</h3>
+                <p>Visualize your trading performance with interactive Doughnut and Line charts to spot trends at a glance.</p>
             </div>
         </div>
     </section>
 
-    <footer style="text-align: center; padding: 2rem; opacity: 0.7;">
-        Stock Profit Maximization System &copy; 2026
+    <!-- How it Works Section -->
+    <section id="how-it-works" class="how-it-works-section">
+        <div class="section-header">
+            <h2>The Science Behind the Profit</h2>
+            <p>Our Strategy Analyzer uses a single-pass array traversal algorithm to guarantee maximum returns.</p>
+        </div>
+        
+        <div class="steps-container">
+            <div class="glass-panel step-card">
+                <div class="step-number">1</div>
+                <h4>Input Prices</h4>
+                <p>Provide a chronological sequence of stock prices over a given period.</p>
+            </div>
+            <div class="glass-panel step-card">
+                <div class="step-number">2</div>
+                <h4>Analyze Minimums</h4>
+                <p>The algorithm tracks the lowest historical price continuously in O(1) space.</p>
+            </div>
+            <div class="glass-panel step-card">
+                <div class="step-number">3</div>
+                <h4>Calculate Margins</h4>
+                <p>It checks the potential profit against the current price, updating the maximum profit found.</p>
+            </div>
+            <div class="glass-panel step-card">
+                <div class="step-number">4</div>
+                <h4>Get Signals</h4>
+                <p>Receive precise Buy and Sell signals mapped out on an interactive chart.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="glass-panel cta-panel">
+            <h2>Ready to Maximize Your Portfolio?</h2>
+            <p>Join StockDeck today and experience professional-grade trading analytics powered by algorithms.</p>
+            <a href="register.html" class="btn btn-primary btn-lg" style="margin-top: 1.5rem;">Create Your Account Now</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="brand"><i class='bx bx-trending-up'></i> StockDeck</div>
+                <p style="opacity: 0.7; font-size: 0.9rem; margin-top: 0.5rem; max-width: 300px;">
+                    Advanced fintech analytics platform integrating dynamic programming for optimal stock trading strategies.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it Works</a>
+                <a href="login.html">Login</a>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            Stock Profit Maximization System &copy; 2026. All rights reserved.
+        </div>
     </footer>
 
     <script src="js/theme.js"></script>
