@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strategy Analyzer - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <nav>
+    <nav class="topbar">
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
         </div>
     </nav>
 
-    <div class="dashboard">
-        <aside class="glass-panel sidebar">
+    <div class="app-container">
+        <aside class="sidebar">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html">Calculator</a></li>
@@ -27,11 +27,11 @@
         </aside>
 
         <main class="main-content">
-            <h2 style="margin-bottom: 0.5rem;">📈 Dynamic Programming Stock Strategy Analyzer</h2>
-            <p style="opacity: 0.8; margin-bottom: 2rem;">Find the maximum profit obtainable from a stock price sequence in O(n) time.</p>
+            <h2 style="font-size: 2rem; letter-spacing: -0.02em;">📈 Dynamic Programming Stock Strategy Analyzer</h2>
+            <p style="opacity: 0.8; margin-bottom: 2rem; font-size: 1.1rem;">Find the maximum profit obtainable from a stock price sequence in exactly O(n) time and O(1) space.</p>
             
             <div class="charts-grid" style="grid-template-columns: 1fr 1fr;">
-                <div class="glass-panel form-container" style="margin: 0; max-width: 100%;">
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px;">
                     <h3 style="margin-bottom: 1rem;">Input Price Sequence</h3>
                     <div id="alertBox" class="alert"></div>
                     <form id="strategyForm">
@@ -53,7 +53,7 @@
                     </div>
                 </div>
 
-                <div class="glass-panel" style="padding: 1.5rem; display: none;" id="resultSection">
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: none;" id="resultSection">
                     <h3 style="margin-bottom: 1.5rem; text-align: center;">Results & Recommendation</h3>
                     
                     <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; text-align: center;">

@@ -466,21 +466,55 @@ footer {
     border-color: var(--primary-color);
 }
 
-/* Dashboard */
-.dashboard {
-    padding: 6rem 2rem 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 2rem;
+/* Dashboard App Shell */
+.app-container {
+    display: flex;
+    flex: 1;
+    margin-top: 70px; /* Height of the top nav */
+    min-height: calc(100vh - 70px);
+    background: var(--bg-color);
+}
+
+.topbar {
+    height: 70px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2.5rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.topbar .brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    letter-spacing: -0.02em;
 }
 
 .sidebar {
-    padding: 1.5rem;
-    height: calc(100vh - 8rem);
-    position: sticky;
-    top: 6rem;
+    width: 280px;
+    background: var(--card-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-right: 1px solid var(--card-border);
+    padding: 2rem 1.5rem;
+    height: calc(100vh - 70px);
+    position: fixed;
+    left: 0;
+    top: 70px;
+    overflow-y: auto;
+    z-index: 900;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
 }
 
 .sidebar ul {
@@ -498,31 +532,57 @@ footer {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.8;
 }
 
-.sidebar a:hover, .sidebar a.active {
-    background: rgba(59, 130, 246, 0.1);
+.sidebar a:hover {
+    background: rgba(59, 130, 246, 0.08);
     color: var(--primary-color);
+    opacity: 1;
+}
+
+.sidebar a.active {
+    background: var(--primary-color);
+    color: white;
+    opacity: 1;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+    font-weight: 600;
 }
 
 .main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2.5rem 3.5rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    width: calc(100% - 280px);
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
 }
 
 .stat-card {
-    padding: 1.5rem;
-    text-align: center;
+    padding: 1.75rem;
+    text-align: left;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    pointer-events: none;
 }
 
 .stat-card h3 {
@@ -530,12 +590,13 @@ footer {
     opacity: 0.7;
     margin-bottom: 0.75rem;
     font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
 .stat-card .value {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
 }
 
 .charts-grid {
@@ -546,63 +607,117 @@ footer {
 
 .chart-card {
     padding: 1.5rem;
-    min-height: 350px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container {
+    position: relative;
+    flex-grow: 1;
+    min-height: 300px;
+    width: 100%;
 }
 
 /* Tables */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
+    white-space: nowrap;
 }
 
 th, td {
-    padding: 1rem;
+    padding: 1.25rem 1.5rem;
     text-align: left;
     border-bottom: 1px solid var(--card-border);
 }
 
 th {
     font-weight: 600;
-    opacity: 0.7;
+    opacity: 0.8;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     letter-spacing: 0.05em;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] th {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
 }
 
 /* Theme Toggle */
 .theme-toggle {
-    background: none;
-    border: none;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     color: var(--text-color);
     cursor: pointer;
-    font-size: 1.5rem;
-    margin-left: 1rem;
+    font-size: 1.25rem;
+    margin-left: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    transition: background-color 0.2s;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .theme-toggle:hover {
-    background: rgba(128, 128, 128, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 /* Alert */
 .alert {
-    padding: 1rem;
-    border-radius: 8px;
+    padding: 1.25rem;
+    border-radius: 12px;
     margin-bottom: 1.5rem;
     display: none;
     font-size: 0.95rem;
     font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .alert.success { background: rgba(16, 185, 129, 0.1); color: var(--accent-color); border: 1px solid rgba(16, 185, 129, 0.2); display: block; }
 .alert.error { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); display: block; }
 
 /* Responsive tweaks */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 2rem;
+    }
+    .sidebar {
+        display: none; /* In a real app, we'd use a hamburger menu here, but keeping it simple */
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 900px) {
     .hero-container {
         grid-template-columns: 1fr;
@@ -616,19 +731,6 @@ th {
     .hero-stats {
         justify-content: center;
     }
-    
-    .dashboard {
-        grid-template-columns: 1fr;
-    }
-    
-    .sidebar {
-        height: auto;
-        position: static;
-    }
-    
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (max-width: 600px) {
@@ -638,5 +740,13 @@ th {
     
     .nav-container .links a:not(.btn) {
         display: none;
+    }
+    
+    .main-content {
+        padding: 1.5rem 1rem;
+    }
+    
+    .topbar {
+        padding: 0 1.5rem;
     }
 }

@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
-    <nav>
+    <nav class="topbar">
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
         </div>
     </nav>
 
-    <div class="dashboard">
-        <aside class="glass-panel sidebar">
+    <div class="app-container">
+        <aside class="sidebar">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html" class="active">Calculator</a></li>
@@ -25,10 +25,11 @@
             </ul>
         </aside>
 
-        <main class="main-content">
-            <h2 style="margin-bottom: 1.5rem;">Profit / Loss Calculator</h2>
-            
-            <div class="glass-panel form-container" style="margin: 0; max-width: 600px;">
+        <main class="main-content" style="align-items: center;">
+            <div style="width: 100%; max-width: 600px;">
+                <h2 style="margin-bottom: 2rem;">Profit / Loss Calculator</h2>
+                
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px;">
                 <div id="alertBox" class="alert"></div>
                 <form id="calcForm">
                     <div class="form-group">
@@ -50,9 +51,10 @@
                     <button type="submit" class="btn btn-primary">Calculate & Save</button>
                 </form>
 
-                <div id="resultBox" style="margin-top: 2rem; display: none;">
-                    <h3>Result</h3>
-                    <p style="font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem;" id="calcResultText"></p>
+                    <div id="resultBox" style="margin-top: 2rem; display: none; padding-top: 1.5rem; border-top: 1px solid var(--card-border); text-align: center;">
+                        <h3 style="opacity: 0.8; font-size: 0.95rem;">Result</h3>
+                        <p style="font-size: 1.8rem; font-weight: 700; margin-top: 0.5rem;" id="calcResultText"></p>
+                    </div>
                 </div>
             </div>
         </main>

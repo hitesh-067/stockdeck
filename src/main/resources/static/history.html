@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>History - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
-    <nav>
+    <nav class="topbar">
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
         </div>
     </nav>
 
-    <div class="dashboard">
-        <aside class="glass-panel sidebar">
+    <div class="app-container">
+        <aside class="sidebar">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html">Calculator</a></li>
@@ -26,12 +26,12 @@
         </aside>
 
         <main class="main-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2>Transaction History</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 2rem; letter-spacing: -0.02em;">Transaction History</h2>
                 <button id="clearHistoryBtn" class="btn btn-danger">Clear History</button>
             </div>
             
-            <div class="glass-panel" style="padding: 1rem; overflow-x: auto;">
+            <div class="table-container">
                 <table id="historyTable">
                     <thead>
                         <tr>
