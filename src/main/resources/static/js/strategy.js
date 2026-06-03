@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Hide placeholder, show results
             document.getElementById('placeholderSection').style.display = 'none';
             document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('chartSection').style.display = 'block';
 
             let tickerOrManual = currentMode === 'live' ? document.getElementById('ticker').value.trim().toUpperCase() : 'your manual input';
             
@@ -211,95 +212,95 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('nl-summary').style.color = 'var(--danger-color)';
         }
 
-        renderChart(chartData, result.buyIndices, result.sellIndices);
+        renderChart(prices, labels, result.buyIndices, result.sellIndices);
     }
 
-    function renderChart(chartData, buyIndices, sellIndices) {
-        const chartContainer = document.getElementById('strategyChart');
-        chartContainer.innerHTML = ''; // Clear previous chart
-        
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const textColor = isDark ? '#f8fafc' : '#111827';
-        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-        const bg = isDark ? 'transparent' : 'transparent';
-
-        const chart = LightweightCharts.createChart(chartContainer, {
-            width: chartContainer.clientWidth,
-            height: chartContainer.clientHeight,
-            layout: {
-                background: { type: 'solid', color: bg },
-                textColor: textColor,
-            },
-            grid: {
-                vertLines: { color: gridColor },
-                horzLines: { color: gridColor },
-            },
-            rightPriceScale: {
-                borderVisible: false,
-            },
-            timeScale: {
-                borderVisible: false,
-            },
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            chart.applyOptions({ width: chartContainer.clientWidth, height: chartContainer.clientHeight });
-        });
-
-        let series;
-        if (currentMode === 'live') {
-            series = chart.addCandlestickSeries({
-                upColor: '#10b981',
-                downColor: '#ef4444',
-                borderVisible: false,
-                wickUpColor: '#10b981',
-                wickDownColor: '#ef4444',
-            });
-            series.setData(chartData);
-        } else {
-            series = chart.addLineSeries({
-                color: '#3b82f6',
-                lineWidth: 2,
-            });
-            series.setData(chartData);
+    function renderChart(prices, labels, buyIndices, sellIndices) {
+        const canvas = document.getElementById('strategyChart');
+        const ctx = canvas.getContext('2d');
+        if (strategyChart) {
+            strategyChart.destroy();
         }
-
-        // Add Markers
-        const markers = [];
         
-        buyIndices.forEach(idx => {
-            if(chartData[idx]) {
-                markers.push({
-                    time: chartData[idx].time,
-                    position: 'belowBar',
-                    color: '#10b981',
-                    shape: 'arrowUp',
-                    text: 'BUY',
-                });
-            }
-        });
-        
-        sellIndices.forEach(idx => {
-            if(chartData[idx]) {
-                markers.push({
-                    time: chartData[idx].time,
-                    position: 'aboveBar',
-                    color: '#ef4444',
-                    shape: 'arrowDown',
-                    text: 'SELL',
-                });
-            }
-        });
-        
-        // Sort markers by time (Lightweight charts requirement)
-        markers.sort((a, b) => {
-            return (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0);
+        const pointColors = prices.map((_, i) => {
+            if (buyIndices.includes(i)) return '#10b981'; // Green for BUY
+            if (sellIndices.includes(i)) return '#ef4444'; // Red for SELL
+            return 'transparent'; // No point
         });
 
-        series.setMarkers(markers);
-        chart.timeScale().fitContent();
-        strategyChart = chart; // Save reference for resize/theme changes if needed
+        const pointRadii = prices.map((_, i) => {
+            if (buyIndices.includes(i) || sellIndices.includes(i)) return 6;
+            return 0;
+        });
+
+        const pointBorderWidths = prices.map((_, i) => {
+            if (buyIndices.includes(i) || sellIndices.includes(i)) return 2;
+            return 0;
+        });
+        
+        // Ensure gradient has height. We use canvas height or a default.
+        const chartHeight = canvas.parentElement.clientHeight || 400;
+        let gradient = ctx.createLinearGradient(0, 0, 0, chartHeight);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+        strategyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Stock Price (₹)',
+                    data: prices,
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.2, // Smooth curve
+                    pointBackgroundColor: pointColors,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: pointBorderWidths,
+                    pointRadius: pointRadii,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: 'rgba(255,255,255,0.6)' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                        ticks: { color: 'rgba(255,255,255,0.6)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                let label = 'Price: ₹' + context.parsed.y.toFixed(2);
+                                if (buyIndices.includes(context.dataIndex)) label += ' (BUY SIGNAL)';
+                                if (sellIndices.includes(context.dataIndex)) label += ' (SELL SIGNAL)';
+                                return label;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        });
     }
 
     // Re-render chart on theme change to update colors

@@ -10,6 +10,7 @@
 </head>
 <body>
     <nav class="topbar">
+        <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <span id="nav-username" style="font-weight: 600; margin-right: 1.5rem;"></span>
@@ -19,16 +20,29 @@
     </nav>
 
     <div class="app-container">
-        <aside class="sidebar">
+        <aside class="sidebar" style="display: flex; flex-direction: column; justify-content: space-between;">
             <ul>
                 <li><a href="dashboard.html" class="active">Dashboard</a></li>
                 <li><a href="calculator.html">Calculator</a></li>
                 <li><a href="history.html">History</a></li>
                 <li><a href="strategy.html">Strategy Analyzer</a></li>
+                <li><a href="profile.html">Profile Settings</a></li>
             </ul>
+            <div class="sidebar-logo" style="padding: 1.5rem; text-align: center; margin-top: auto; opacity: 0.8; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));">
+                    <path d="M3 3V21H21" stroke="var(--card-border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 14L11 9L15 13L21 5" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="21" cy="5" r="3" fill="var(--primary-color)"/>
+                    <circle cx="15" cy="13" r="2" fill="var(--card-border)"/>
+                    <circle cx="11" cy="9" r="2" fill="var(--card-border)"/>
+                    <circle cx="7" cy="14" r="2" fill="var(--card-border)"/>
+                </svg>
+                <div style="font-size: 0.8rem; letter-spacing: 0.1em; color: var(--text-color); opacity: 0.5; text-transform: uppercase;">Pro Analytics</div>
+            </div>
         </aside>
 
-        <main class="main-content" style="padding-top: 0;">
+        <main class="main-content" style="padding-top: 0; position: relative;">
+            <div class="ambient-glow"></div>
             <!-- TradingView Ticker Tape Widget -->
             <div class="tradingview-widget-container" style="margin-bottom: 2rem;">
               <div class="tradingview-widget-container__widget"></div>
@@ -51,38 +65,34 @@
               </script>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; padding: 0 1rem;">
-                <h2 style="font-size: 2rem; letter-spacing: -0.02em;">Welcome back, <span id="welcome-name" style="color: var(--primary-color);"></span>! 👋</h2>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; padding: 0 1rem; position: relative; z-index: 10;">
+                <h2 style="font-size: 2rem; letter-spacing: -0.02em;">Welcome back, <span id="welcome-name" class="text-gradient"></span></h2>
                 <div style="display: flex; gap: 1rem;">
-                    <a href="calculator.html" class="btn btn-primary" style="text-decoration: none;">➕ New Trade</a>
-                    <a href="strategy.html" class="btn btn-outline" style="text-decoration: none;">🧠 Analyze</a>
+                    <a href="calculator.html" class="btn btn-primary" style="text-decoration: none;">New Trade</a>
+                    <a href="strategy.html" class="btn btn-outline" style="text-decoration: none;">Analyze</a>
                 </div>
             </div>
             
             <div class="stats-grid">
-                <div class="glass-panel stat-card" style="border-top: 4px solid var(--primary-color); position: relative; overflow: hidden;">
-                    <div style="position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.05; pointer-events: none;">🎯</div>
+                <div class="glass-panel stat-card" style="position: relative; overflow: hidden;">
                     <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Win Rate</h3>
                     <div style="display: flex; align-items: baseline; gap: 0.5rem;">
                         <p id="stat-winrate" style="font-size: 2.2rem; font-weight: 700; margin: 0;">0%</p>
                         <span id="stat-calcs" style="font-size: 0.9rem; opacity: 0.6;">(0 trades)</span>
                     </div>
-                    <div style="width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; margin-top: 1rem; overflow: hidden;">
-                        <div id="winrate-bar" style="height: 100%; background: var(--primary-color); width: 0%; transition: width 1s ease-in-out;"></div>
+                    <div style="width: 100%; background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; margin-top: 1rem; overflow: hidden;">
+                        <div id="winrate-bar" style="height: 100%; background: linear-gradient(90deg, var(--primary-color), #60a5fa); width: 0%; transition: width 1s ease-in-out;"></div>
                     </div>
                 </div>
-                <div class="glass-panel stat-card" style="border-top: 4px solid var(--accent-color); position: relative; overflow: hidden;">
-                    <div style="position: absolute; right: 0; bottom: -10px; font-size: 5rem; opacity: 0.05; pointer-events: none;">📈</div>
+                <div class="glass-panel stat-card" style="position: relative; overflow: hidden;">
                     <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Total Profit</h3>
-                    <p id="stat-profit" style="font-size: 2.2rem; font-weight: 700; color: var(--accent-color); margin: 0;">₹0.00</p>
+                    <p id="stat-profit" style="font-size: 2.2rem; font-weight: 700; color: #34d399; margin: 0; text-shadow: 0 0 10px rgba(52,211,153,0.3);">₹0.00</p>
                 </div>
-                <div class="glass-panel stat-card" style="border-top: 4px solid var(--danger-color); position: relative; overflow: hidden;">
-                    <div style="position: absolute; right: 0; bottom: -10px; font-size: 5rem; opacity: 0.05; pointer-events: none;">📉</div>
+                <div class="glass-panel stat-card" style="position: relative; overflow: hidden;">
                     <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Total Loss</h3>
-                    <p id="stat-loss" style="font-size: 2.2rem; font-weight: 700; color: var(--danger-color); margin: 0;">₹0.00</p>
+                    <p id="stat-loss" style="font-size: 2.2rem; font-weight: 700; color: #fb7185; margin: 0; text-shadow: 0 0 10px rgba(251,113,133,0.3);">₹0.00</p>
                 </div>
-                <div class="glass-panel stat-card" style="border-top: 4px solid #a855f7; position: relative; overflow: hidden;">
-                    <div style="position: absolute; right: 10px; bottom: -10px; font-size: 5rem; opacity: 0.05; pointer-events: none;">🏆</div>
+                <div class="glass-panel stat-card" style="position: relative; overflow: hidden;">
                     <h3 style="margin-bottom: 0.5rem; opacity: 0.8; font-size: 0.95rem;">Top Stock</h3>
                     <p id="stat-top-stock" style="font-size: 2.2rem; font-weight: 700; margin: 0;">N/A</p>
                     <p id="stat-top-profit" style="color: var(--accent-color); font-weight: 600; margin-top: 0.25rem; font-size: 0.9rem;"></p>
@@ -128,6 +138,7 @@
 
     <script src="js/theme.js"></script>
     <script src="js/toast.js"></script>
+    <script src="js/mobile.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

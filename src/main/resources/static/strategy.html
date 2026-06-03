@@ -6,7 +6,7 @@
     <title>Strategy Analyzer - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=3">
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="topbar">
@@ -26,8 +26,16 @@
                 <li><a href="strategy.html" class="active">Strategy Analyzer</a></li>
                 <li><a href="profile.html">Profile Settings</a></li>
             </ul>
-            <div class="sidebar-bull" style="padding: 1rem; text-align: center; margin-top: auto; opacity: 0.9;">
-                <img src="img/bull.png" alt="Stock Market Bull" style="width: 100%; max-width: 180px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);">
+            <div class="sidebar-logo" style="padding: 1.5rem; text-align: center; margin-top: auto; opacity: 0.8; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));">
+                    <path d="M3 3V21H21" stroke="var(--card-border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 14L11 9L15 13L21 5" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="21" cy="5" r="3" fill="var(--primary-color)"/>
+                    <circle cx="15" cy="13" r="2" fill="var(--card-border)"/>
+                    <circle cx="11" cy="9" r="2" fill="var(--card-border)"/>
+                    <circle cx="7" cy="14" r="2" fill="var(--card-border)"/>
+                </svg>
+                <div style="font-size: 0.8rem; letter-spacing: 0.1em; color: var(--text-color); opacity: 0.5; text-transform: uppercase;">Pro Analytics</div>
             </div>
         </aside>
 
@@ -120,10 +128,23 @@
                             <div style="font-size: 1.5rem; font-weight: 700; color: #a855f7;" id="resROI">0%</div>
                         </div>
                     </div>
-                    
-                    <div style="height: 300px; position: relative;">
-                        <div id="strategyChart" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Professional Interactive Chart Section -->
+            <div id="chartSection" class="glass-panel" style="margin-top: 2rem; padding: 2rem; border-radius: 20px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.25rem;">Price Action Analysis</h3>
+                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.6; margin-top: 0.25rem;">Interactive visualization of identified trading signals</p>
                     </div>
+                    <div style="display: flex; gap: 1rem; font-size: 0.85rem; opacity: 0.8;">
+                        <span style="display: flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 8px var(--accent-color);"></span> Buy Signal</span>
+                        <span style="display: flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--danger-color); box-shadow: 0 0 8px var(--danger-color);"></span> Sell Signal</span>
+                    </div>
+                </div>
+                <div style="height: 400px; position: relative; width: 100%;">
+                    <canvas id="strategyChart"></canvas>
                 </div>
             </div>
         </main>

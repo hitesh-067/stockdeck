@@ -9,6 +9,7 @@
 </head>
 <body>
     <nav class="topbar">
+        <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
@@ -16,13 +17,25 @@
     </nav>
 
     <div class="app-container">
-        <aside class="sidebar">
+        <aside class="sidebar" style="display: flex; flex-direction: column; justify-content: space-between;">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html" class="active">Calculator</a></li>
                 <li><a href="history.html">History</a></li>
                 <li><a href="strategy.html">Strategy Analyzer</a></li>
+                <li><a href="profile.html">⚙️ Profile Settings</a></li>
             </ul>
+            <div class="sidebar-logo" style="padding: 1.5rem; text-align: center; margin-top: auto; opacity: 0.8; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));">
+                    <path d="M3 3V21H21" stroke="var(--card-border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 14L11 9L15 13L21 5" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="21" cy="5" r="3" fill="var(--primary-color)"/>
+                    <circle cx="15" cy="13" r="2" fill="var(--card-border)"/>
+                    <circle cx="11" cy="9" r="2" fill="var(--card-border)"/>
+                    <circle cx="7" cy="14" r="2" fill="var(--card-border)"/>
+                </svg>
+                <div style="font-size: 0.8rem; letter-spacing: 0.1em; color: var(--text-color); opacity: 0.5; text-transform: uppercase;">Pro Analytics</div>
+            </div>
         </aside>
 
         <main class="main-content" style="align-items: center;">
@@ -61,6 +74,7 @@
 
     <script src="js/theme.js"></script>
     <script src="js/toast.js"></script>
+    <script src="js/mobile.js"></script>
     <script>
         const userId = localStorage.getItem('userId');
         if (!userId) window.location.href = 'login.html';
