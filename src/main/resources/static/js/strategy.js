@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     let strategyChart;
     let currentMode = 'live'; // 'live' or 'manual'
+    let currentPrices = [], currentLabels = [], currentBuyIndices = [], currentSellIndices = [];
 
     // UI Elements
     const modeLiveBtn = document.getElementById('modeLiveBtn');
@@ -212,6 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('nl-summary').style.color = 'var(--danger-color)';
         }
 
+        currentPrices = prices;
+        currentLabels = labels;
+        currentBuyIndices = result.buyIndices;
+        currentSellIndices = result.sellIndices;
         renderChart(prices, labels, result.buyIndices, result.sellIndices);
     }
 
@@ -244,6 +249,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
         gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const tickColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(15,23,42,0.6)';
+        const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.05)';
+        const tooltipBg = isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)';
+        const tooltipTitle = isDark ? '#fff' : '#0f172a';
+        const tooltipBody = isDark ? '#cbd5e1' : '#475569';
+        const tooltipBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
         strategyChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -269,20 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { color: 'rgba(255,255,255,0.6)' }
+                        ticks: { color: tickColor }
                     },
                     y: {
-                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
-                        ticks: { color: 'rgba(255,255,255,0.6)' }
+                        grid: { color: gridColor, drawBorder: false },
+                        ticks: { color: tickColor }
                     }
                 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        titleColor: '#fff',
-                        bodyColor: '#cbd5e1',
-                        borderColor: 'rgba(255,255,255,0.1)',
+                        backgroundColor: tooltipBg,
+                        titleColor: tooltipTitle,
+                        bodyColor: tooltipBody,
+                        borderColor: tooltipBorder,
                         borderWidth: 1,
                         padding: 12,
                         callbacks: {
@@ -305,12 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Re-render chart on theme change to update colors
     window.addEventListener('themeChanged', () => {
-        if (strategyChart) {
-            // Need to trigger a re-analysis visually, or simply re-assign colors
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            if(analyzeBtn && !analyzeBtn.disabled) {
-               document.getElementById('strategyForm').dispatchEvent(new Event('submit'));
-            }
+        if (strategyChart && currentPrices.length > 0) {
+            renderChart(currentPrices, currentLabels, currentBuyIndices, currentSellIndices);
         }
     });
 });

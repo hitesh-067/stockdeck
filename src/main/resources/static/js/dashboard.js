@@ -10,10 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('nav-username').textContent = username;
     document.getElementById('welcome-name').textContent = username;
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
+
 
     let doughnutChart, lineChart;
     let fullHistoryData = []; // Store full history for filtering
