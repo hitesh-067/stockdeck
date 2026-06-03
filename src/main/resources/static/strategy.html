@@ -18,14 +18,17 @@
     </nav>
 
     <div class="app-container">
-        <aside class="sidebar">
+        <aside class="sidebar" style="display: flex; flex-direction: column; justify-content: space-between;">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html">Calculator</a></li>
                 <li><a href="history.html">History</a></li>
                 <li><a href="strategy.html" class="active">Strategy Analyzer</a></li>
-                <li><a href="profile.html">⚙️ Profile Settings</a></li>
+                <li><a href="profile.html">Profile Settings</a></li>
             </ul>
+            <div class="sidebar-bull" style="padding: 1rem; text-align: center; margin-top: auto; opacity: 0.9;">
+                <img src="img/bull.png" alt="Stock Market Bull" style="width: 100%; max-width: 180px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);">
+            </div>
         </aside>
 
         <main class="main-content" style="position: relative; overflow: hidden;">
@@ -33,7 +36,7 @@
             
             <div style="margin-bottom: 2rem;">
                 <h2 style="display: flex; align-items: center; gap: 0.5rem; font-size: 2rem;">
-                    📈 Algorithmic Trading Simulator
+                    Algorithmic Trading Simulator
                 </h2>
                 <p style="color: var(--text-color); opacity: 0.8; font-size: 1.1rem; max-width: 600px;">
                     Backtest strategies against 30 days of real market data to find the maximum possible profit.
@@ -47,8 +50,8 @@
                     
                     <div class="segmented-control">
                         <div class="segment-highlight" id="segment-highlight"></div>
-                        <button id="modeLiveBtn" class="segmented-btn active">🌐 Live Ticker (Pro)</button>
-                        <button id="modeManualBtn" class="segmented-btn">✍️ Manual Input</button>
+                        <button id="modeLiveBtn" class="segmented-btn active">Live Ticker (Pro)</button>
+                        <button id="modeManualBtn" class="segmented-btn">Manual Input</button>
                     </div>
 
                     <form id="strategyForm">
@@ -69,27 +72,25 @@
                             </select>
                         </div>
                         
-                        <button type="submit" id="analyzeBtn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">⚡ Run Analysis</button>
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">Run Analysis</button>
                     </form>
                 </div>
                 
                 <!-- Right Side: Placeholder Instructions (Shows initially) -->
                 <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" id="placeholderSection">
-                    <div style="font-size: 4rem; opacity: 0.5; margin-bottom: 1rem;">🤖</div>
+                    <svg style="width: 64px; height: 64px; color: var(--primary-color); opacity: 0.8; margin-bottom: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                     <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Awaiting Instructions</h3>
                     <p style="opacity: 0.7; max-width: 300px; margin-bottom: 2rem; line-height: 1.6;">
                         Select an algorithm on the left and enter a stock ticker to simulate trading over the last 30 days.
                     </p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; text-align: left;">
-                        <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">
-                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">1️⃣</div>
-                            <strong>Single Trade</strong>
-                            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">Finds the single best buy/sell day.</p>
+                        <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div style="color: var(--primary-color); font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem;">Single Trade</div>
+                            <p style="font-size: 0.85rem; opacity: 0.7; margin: 0; line-height: 1.4;">Finds the single best buy/sell day for maximum net return.</p>
                         </div>
-                        <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">
-                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">♾️</div>
-                            <strong>Peak & Valley</strong>
-                            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">Captures every upward trend.</p>
+                        <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div style="color: var(--accent-color); font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem;">Peak & Valley</div>
+                            <p style="font-size: 0.85rem; opacity: 0.7; margin: 0; line-height: 1.4;">Captures every upward trend across multiple trades.</p>
                         </div>
                     </div>
                 </div>

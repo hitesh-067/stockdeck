@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // if both are 0, chart looks empty, provide some default visual
         const data = (profit === 0 && loss === 0) ? [1] : [profit, loss];
-        const bgColors = (profit === 0 && loss === 0) ? ['#cbd5e1'] : ['#10b981', '#ef4444'];
+        const bgColors = (profit === 0 && loss === 0) ? ['#cbd5e1'] : ['#34d399', '#fb7185'];
         const labels = (profit === 0 && loss === 0) ? ['No Data'] : ['Profit', 'Loss'];
 
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -83,16 +83,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 datasets: [{
                     data: data,
                     backgroundColor: bgColors,
-                    borderWidth: 0
+                    borderWidth: 0,
+                    borderRadius: 8,
+                    hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: '75%',
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: textColor }
+                        labels: { color: textColor, padding: 20, usePointStyle: true }
                     }
                 }
             }
@@ -110,6 +113,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Prepare data: chronological sort might be needed if they were timestamps, but here we just take order of insertion
         const labels = history.map((_, i) => `Trade ${i+1}`);
         const data = history.map(h => h.profit);
+        
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
         lineChart = new Chart(ctx, {
             type: 'line',
@@ -119,9 +126,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     label: 'Profit/Loss (₹)',
                     data: data,
                     borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: 'transparent',
+                    pointRadius: 0,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
@@ -130,17 +142,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 scales: {
                     x: {
                         ticks: { color: textColor },
-                        grid: { color: gridColor }
+                        grid: { display: false }
                     },
                     y: {
                         ticks: { color: textColor },
-                        grid: { color: gridColor }
+                        grid: { color: gridColor, drawBorder: false }
                     }
                 },
                 plugins: {
-                    legend: {
-                        labels: { color: textColor }
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        titleColor: textColor,
+                        bodyColor: textColor,
+                        borderColor: gridColor,
+                        borderWidth: 1
                     }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
                 }
             }
         });
