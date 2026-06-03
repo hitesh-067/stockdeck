@@ -54,8 +54,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('API Error');
                 }
 
+                // If live data, we have open, high, low, prices (close), timestamps
                 prices = data.prices;
-                // Convert unix timestamps to readable dates for labels
+                const ohlcData = [];
+                for(let i = 0; i < data.timestamps.length; i++) {
+                    ohlcData.push({
+                        time: data.timestamps[i], // unix timestamp in seconds
+                        open: data.open[i],
+                        high: data.high[i],
+                        low: data.low[i],
+                        close: data.prices[i]
+                    });
+                }
+                
+                // Keep labels for UI
                 labels = data.timestamps.map(ts => {
                     const d = new Date(ts * 1000);
                     return `${d.getMonth()+1}/${d.getDate()}`;
@@ -88,7 +100,26 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('resultSection').style.display = 'block';
 
             let tickerOrManual = currentMode === 'live' ? document.getElementById('ticker').value.trim().toUpperCase() : 'your manual input';
-            updateUI(result, prices, labels, tickerOrManual);
+            
+            // Re-fetch data if live for OHLC to pass to updateUI, or pass it directly
+            let chartData = null;
+            if (currentMode === 'live') {
+                 chartData = [];
+                 const data = await (await fetch(`/api/stock/history/${tickerOrManual}?range=1mo`)).json();
+                 for(let i = 0; i < data.timestamps.length; i++) {
+                    chartData.push({
+                        time: data.timestamps[i],
+                        open: data.open[i],
+                        high: data.high[i],
+                        low: data.low[i],
+                        close: data.prices[i]
+                    });
+                 }
+            } else {
+                 chartData = prices.map((p, i) => ({ time: i, value: p }));
+            }
+            
+            updateUI(result, prices, labels, tickerOrManual, chartData);
 
         } catch (err) {
             console.error(err);
@@ -152,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function updateUI(result, prices, labels, ticker) {
+    function updateUI(result, prices, labels, ticker, chartData) {
         
         if (result.maxProfit > 0) {
             let investment = result.type === 'single' ? prices[result.buyIndices[0]] : prices[0];
@@ -180,69 +211,95 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('nl-summary').style.color = 'var(--danger-color)';
         }
 
-        renderChart(prices, labels, result.buyIndices, result.sellIndices);
+        renderChart(chartData, result.buyIndices, result.sellIndices);
     }
 
-    function renderChart(prices, labels, buyIndices, sellIndices) {
-        const ctx = document.getElementById('strategyChart').getContext('2d');
-        if (strategyChart) strategyChart.destroy();
-
+    function renderChart(chartData, buyIndices, sellIndices) {
+        const chartContainer = document.getElementById('strategyChart');
+        chartContainer.innerHTML = ''; // Clear previous chart
+        
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const textColor = isDark ? '#f8fafc' : '#111827';
         const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+        const bg = isDark ? 'transparent' : 'transparent';
 
-        // Create point styles: green for buy, red for sell, invisible for normal
-        const pointColors = prices.map((_, i) => {
-            if (buyIndices.includes(i)) return '#10b981'; // Green
-            if (sellIndices.includes(i)) return '#ef4444'; // Red
-            return 'rgba(0,0,0,0)'; // Transparent
+        const chart = LightweightCharts.createChart(chartContainer, {
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight,
+            layout: {
+                background: { type: 'solid', color: bg },
+                textColor: textColor,
+            },
+            grid: {
+                vertLines: { color: gridColor },
+                horzLines: { color: gridColor },
+            },
+            rightPriceScale: {
+                borderVisible: false,
+            },
+            timeScale: {
+                borderVisible: false,
+            },
         });
         
-        const pointRadii = prices.map((_, i) => {
-            if (buyIndices.includes(i) || sellIndices.includes(i)) return 6;
-            return 0;
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            chart.applyOptions({ width: chartContainer.clientWidth, height: chartContainer.clientHeight });
         });
 
-        strategyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Stock Price',
-                    data: prices,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.2,
-                    pointBackgroundColor: pointColors,
-                    pointBorderColor: pointColors,
-                    pointRadius: pointRadii,
-                    pointHoverRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
-                },
-                plugins: {
-                    legend: { labels: { color: textColor } },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = `Price: ₹${context.parsed.y.toFixed(2)}`;
-                                if (buyIndices.includes(context.dataIndex)) label += ' (BUY)';
-                                if (sellIndices.includes(context.dataIndex)) label += ' (SELL)';
-                                return label;
-                            }
-                        }
-                    }
-                }
+        let series;
+        if (currentMode === 'live') {
+            series = chart.addCandlestickSeries({
+                upColor: '#10b981',
+                downColor: '#ef4444',
+                borderVisible: false,
+                wickUpColor: '#10b981',
+                wickDownColor: '#ef4444',
+            });
+            series.setData(chartData);
+        } else {
+            series = chart.addLineSeries({
+                color: '#3b82f6',
+                lineWidth: 2,
+            });
+            series.setData(chartData);
+        }
+
+        // Add Markers
+        const markers = [];
+        
+        buyIndices.forEach(idx => {
+            if(chartData[idx]) {
+                markers.push({
+                    time: chartData[idx].time,
+                    position: 'belowBar',
+                    color: '#10b981',
+                    shape: 'arrowUp',
+                    text: 'BUY',
+                });
             }
         });
+        
+        sellIndices.forEach(idx => {
+            if(chartData[idx]) {
+                markers.push({
+                    time: chartData[idx].time,
+                    position: 'aboveBar',
+                    color: '#ef4444',
+                    shape: 'arrowDown',
+                    text: 'SELL',
+                });
+            }
+        });
+        
+        // Sort markers by time (Lightweight charts requirement)
+        markers.sort((a, b) => {
+            return (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0);
+        });
+
+        series.setMarkers(markers);
+        chart.timeScale().fitContent();
+        strategyChart = chart; // Save reference for resize/theme changes if needed
     }
 
     // Re-render chart on theme change to update colors

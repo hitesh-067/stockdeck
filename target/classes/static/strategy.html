@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strategy Analyzer - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <nav>
+    <nav class="topbar">
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
         </div>
     </nav>
 
-    <div class="dashboard">
-        <aside class="glass-panel sidebar">
+    <div class="app-container">
+        <aside class="sidebar">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html">Calculator</a></li>
@@ -26,37 +26,80 @@
             </ul>
         </aside>
 
-        <main class="main-content">
-            <h2 style="margin-bottom: 0.5rem;">📈 Dynamic Programming Stock Strategy Analyzer</h2>
-            <p style="opacity: 0.8; margin-bottom: 2rem;">Find the maximum profit obtainable from a stock price sequence in O(n) time.</p>
+        <main class="main-content" style="position: relative; overflow: hidden;">
+            <div class="ambient-glow"></div>
+            
+            <div style="margin-bottom: 2rem;">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; font-size: 2rem;">
+                    📈 Algorithmic Trading Simulator
+                </h2>
+                <p style="color: var(--text-color); opacity: 0.8; font-size: 1.1rem; max-width: 600px;">
+                    Backtest strategies against 30 days of real market data to find the maximum possible profit.
+                </p>
+            </div>
             
             <div class="charts-grid" style="grid-template-columns: 1fr 1fr;">
-                <div class="glass-panel form-container" style="margin: 0; max-width: 100%;">
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px;">
                     <h3 style="margin-bottom: 1rem;">Input Price Sequence</h3>
                     <div id="alertBox" class="alert"></div>
-                    <form id="strategyForm">
-                        <div class="form-group">
-                            <label for="prices">Enter Prices (comma separated)</label>
-                            <input type="text" id="prices" placeholder="e.g. 7, 1, 5, 3, 6, 4, 8, 2, 10" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Analyze Strategy</button>
-                    </form>
                     
-                    <div id="algoInfo" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--card-border);">
-                        <h4>Algorithm Analysis</h4>
-                        <ul style="list-style: none; margin-top: 0.5rem; opacity: 0.9; line-height: 1.6;">
-                            <li><strong>Algorithm:</strong> Dynamic Programming</li>
-                            <li><strong>Time Complexity:</strong> O(n)</li>
-                            <li><strong>Space Complexity:</strong> O(1)</li>
-                            <li><strong>Optimization:</strong> Single Pass Traversal</li>
-                        </ul>
+                    <div class="segmented-control">
+                        <div class="segment-highlight" id="segment-highlight"></div>
+                        <button id="modeLiveBtn" class="segmented-btn active">🌐 Live Ticker (Pro)</button>
+                        <button id="modeManualBtn" class="segmented-btn">✍️ Manual Input</button>
+                    </div>
+
+                    <form id="strategyForm">
+                        <div class="form-group" id="inputLive">
+                            <label for="ticker">Stock Ticker</label>
+                            <input type="text" id="ticker" placeholder="e.g. AAPL, TSLA" style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group" id="inputManual" style="display: none;">
+                            <label for="prices">Enter Prices (comma separated)</label>
+                            <input type="text" id="prices" placeholder="e.g. 7, 1, 5, 3, 6, 4, 8, 2, 10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="algorithm">Select Algorithm</label>
+                            <select id="algorithm" style="width: 100%; padding: 0.85rem; border-radius: 8px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
+                                <option value="single">Single Trade (Find Max Profit)</option>
+                                <option value="multiple">Multiple Trades (Peak & Valley)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">⚡ Run Analysis</button>
+                    </form>
+                </div>
+                
+                <!-- Right Side: Placeholder Instructions (Shows initially) -->
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" id="placeholderSection">
+                    <div style="font-size: 4rem; opacity: 0.5; margin-bottom: 1rem;">🤖</div>
+                    <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Awaiting Instructions</h3>
+                    <p style="opacity: 0.7; max-width: 300px; margin-bottom: 2rem; line-height: 1.6;">
+                        Select an algorithm on the left and enter a stock ticker to simulate trading over the last 30 days.
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; text-align: left;">
+                        <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">1️⃣</div>
+                            <strong>Single Trade</strong>
+                            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">Finds the single best buy/sell day.</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">♾️</div>
+                            <strong>Peak & Valley</strong>
+                            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">Captures every upward trend.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="glass-panel" style="padding: 1.5rem; display: none;" id="resultSection">
-                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Results & Recommendation</h3>
+                <!-- Right Side: Results (Hidden initially) -->
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: none;" id="resultSection">
+                    <h3 style="margin-bottom: 0.5rem; text-align: center;">Results & Recommendation</h3>
+                    <p id="nl-summary" style="text-align: center; color: var(--accent-color); font-weight: 500; margin-bottom: 2rem; font-size: 1.05rem;">
+                        <!-- Filled by JS -->
+                    </p>
                     
-                    <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; text-align: center;">
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; text-align: center; flex-wrap: wrap; gap: 1rem;">
                         <div>
                             <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">BUY SIGNAL</div>
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-color);" id="resBuy">Day -</div>
@@ -69,6 +112,10 @@
                             <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">MAXIMUM PROFIT</div>
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);" id="resProfit">₹0</div>
                         </div>
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">ESTIMATED ROI</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #a855f7;" id="resROI">0%</div>
+                        </div>
                     </div>
                     
                     <div style="height: 300px; position: relative;">
@@ -80,6 +127,7 @@
     </div>
 
     <script src="js/theme.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/strategy.js"></script>
 </body>
 </html>

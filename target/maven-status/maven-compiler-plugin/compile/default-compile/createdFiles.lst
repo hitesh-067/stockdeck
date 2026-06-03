@@ -5,6 +5,7 @@ com\stockdeck\controller\AuthController.class
 com\stockdeck\dto\DashboardStats.class
 com\stockdeck\service\AuthService.class
 com\stockdeck\dto\CalculationRequest.class
+com\stockdeck\controller\StockApiController.class
 com\stockdeck\dto\StrategyRequest.class
 com\stockdeck\model\Calculation.class
 com\stockdeck\dto\StrategyResponse.class

@@ -32,4 +32,35 @@ public class AuthService {
         }
         throw new Exception("Invalid credentials");
     }
+
+    public User getUser(Long id) throws Exception {
+        return userRepository.findById(id).orElseThrow(() -> new Exception("User not found"));
+    }
+
+    public User updateUser(Long id, String newUsername, String newEmail) throws Exception {
+        User user = getUser(id);
+        
+        // Check if new email is taken by someone else
+        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            throw new Exception("Email already in use");
+        }
+        
+        user.setUsername(newUsername);
+        user.setEmail(newEmail);
+        return userRepository.save(user);
+    }
+
+    public void changePassword(Long id, String oldPassword, String newPassword) throws Exception {
+        User user = getUser(id);
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new Exception("Incorrect old password");
+        }
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) throws Exception {
+        User user = getUser(id);
+        userRepository.delete(user);
+    }
 }

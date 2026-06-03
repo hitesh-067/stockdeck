@@ -8,7 +8,13 @@
     <link rel="stylesheet" href="css/style.css?v=3">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    
+    <!-- jsPDF and AutoTable for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
     <nav class="topbar">
+        <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
@@ -22,6 +28,7 @@
                 <li><a href="calculator.html">Calculator</a></li>
                 <li><a href="history.html" class="active">History</a></li>
                 <li><a href="strategy.html">Strategy Analyzer</a></li>
+                <li><a href="profile.html">⚙️ Profile Settings</a></li>
             </ul>
         </aside>
 
@@ -29,7 +36,8 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <h2 style="font-size: 2rem; letter-spacing: -0.02em;">Transaction History</h2>
                 <div>
-                    <button id="exportCsvBtn" class="btn btn-primary" style="margin-right: 0.5rem;">📥 Export to CSV</button>
+                    <button id="exportCsvBtn" class="btn btn-outline" style="margin-right: 0.5rem;">📥 CSV</button>
+                    <button id="exportPdfBtn" class="btn btn-primary" style="margin-right: 0.5rem;">📄 PDF</button>
                     <button id="clearHistoryBtn" class="btn btn-danger">🗑️ Clear History</button>
                 </div>
             </div>
@@ -60,6 +68,7 @@
     
     <script src="js/theme.js"></script>
     <script src="js/toast.js"></script>
+    <script src="js/mobile.js"></script>
     <script>
         const userId = localStorage.getItem('userId');
         if (!userId) window.location.href = 'login.html';
@@ -169,6 +178,60 @@
             window.URL.revokeObjectURL(url);
             
             showToast('Exported to CSV!', 'success');
+        });
+
+        // Export to PDF
+        document.getElementById('exportPdfBtn').addEventListener('click', () => {
+            if (!dataTable) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(22);
+            doc.setTextColor(59, 130, 246); // Primary Color
+            doc.text('StockDeck', 14, 20);
+            
+            doc.setFontSize(14);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Transaction History Report', 14, 30);
+            
+            const date = new Date().toLocaleDateString();
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated on: ${date}`, 14, 37);
+
+            // Table
+            const head = [['Stock Name', 'Buy Price', 'Sell Price', 'Quantity', 'Profit/Loss']];
+            const body = [];
+            
+            dataTable.rows().data().toArray().forEach(row => {
+                const cleanRow = row.slice(0, 5).map(cell => {
+                    return $('<div>').html(cell).text();
+                });
+                body.push(cleanRow);
+            });
+
+            doc.autoTable({
+                head: head,
+                body: body,
+                startY: 45,
+                theme: 'striped',
+                headStyles: { fillColor: [59, 130, 246] },
+                didParseCell: function(data) {
+                    // Color code Profit/Loss column (index 4)
+                    if (data.section === 'body' && data.column.index === 4) {
+                        const val = parseFloat(data.cell.raw.replace(/[^0-9.-]+/g,""));
+                        if (val > 0) {
+                            data.cell.styles.textColor = [16, 185, 129]; // Green
+                        } else if (val < 0) {
+                            data.cell.styles.textColor = [239, 68, 68]; // Red
+                        }
+                    }
+                }
+            });
+            
+            doc.save('StockDeck_History_Report.pdf');
+            showToast('Exported to PDF!', 'success');
         });
 
         fetchHistory();

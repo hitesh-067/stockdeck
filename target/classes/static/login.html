@@ -8,17 +8,19 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="brand">StockDeck</a>
-        <div class="links">
-            <a href="index.html">Home</a>
-            <a href="register.html" class="btn btn-success" style="color: white; margin-left: 1rem;">Register</a>
+    <header class="topbar" style="position: fixed; width: 100%; top: 0; left: 0; padding: 1rem 2rem;">
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">StockDeck</div>
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <a href="index.html" style="color: var(--text-color); text-decoration: none;">Home</a>
+            <a href="register.html" class="btn btn-outline">Register</a>
             <button id="theme-toggle" class="theme-toggle">☀️</button>
         </div>
-    </nav>
+    </header>
 
-    <main>
-        <div class="glass-panel form-container">
+    <main style="display: flex; justify-content: center; align-items: center; min-height: 100vh; position: relative; overflow: hidden;">
+        <div class="ambient-glow" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px;"></div>
+        
+        <div class="glass-panel form-container" style="width: 100%; max-width: 400px; padding: 3rem 2rem; border-radius: 20px; position: relative; z-index: 10;">
             <h2 style="margin-bottom: 1.5rem; text-align: center;">Welcome Back</h2>
             <div id="alertBox" class="alert"></div>
             <form id="loginForm">

@@ -9,6 +9,7 @@
 </head>
 <body>
     <nav class="topbar">
+        <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
@@ -22,6 +23,7 @@
                 <li><a href="calculator.html" class="active">Calculator</a></li>
                 <li><a href="history.html">History</a></li>
                 <li><a href="strategy.html">Strategy Analyzer</a></li>
+                <li><a href="profile.html">⚙️ Profile Settings</a></li>
             </ul>
         </aside>
 
@@ -61,6 +63,7 @@
 
     <script src="js/theme.js"></script>
     <script src="js/toast.js"></script>
+    <script src="js/mobile.js"></script>
     <script>
         const userId = localStorage.getItem('userId');
         if (!userId) window.location.href = 'login.html';

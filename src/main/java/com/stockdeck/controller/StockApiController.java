@@ -65,11 +65,17 @@ public class StockApiController {
                     Map<String, Object> indicators = (Map<String, Object>) resultData.get("indicators");
                     java.util.List<Map<String, Object>> quote = (java.util.List<Map<String, Object>>) indicators.get("quote");
                     java.util.List<Double> close = (java.util.List<Double>) quote.get(0).get("close");
+                    java.util.List<Double> open = (java.util.List<Double>) quote.get(0).get("open");
+                    java.util.List<Double> high = (java.util.List<Double>) quote.get(0).get("high");
+                    java.util.List<Double> low = (java.util.List<Double>) quote.get(0).get("low");
                     
                     return ResponseEntity.ok(Map.of(
                         "symbol", ticker.toUpperCase(),
                         "timestamps", timestamp,
-                        "prices", close
+                        "prices", close,
+                        "open", open,
+                        "high", high,
+                        "low", low
                     ));
                 }
             }

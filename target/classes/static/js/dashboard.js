@@ -16,13 +16,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     let doughnutChart, lineChart;
+    let fullHistoryData = []; // Store full history for filtering
 
     async function fetchStats() {
         try {
+            // Apply skeletons
+            ['stat-calcs', 'stat-profit', 'stat-loss', 'stat-top-stock', 'stat-winrate'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('skeleton');
+            });
+
             const res = await fetch(`/api/calculations/dashboard/stats/${userId}`);
             const stats = await res.json();
 
-            document.getElementById('stat-calcs').textContent = stats.totalCalculations;
+            // Remove skeletons
+            ['stat-calcs', 'stat-profit', 'stat-loss', 'stat-top-stock', 'stat-winrate'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('skeleton');
+            });
+            
+            const winRate = stats.winRate || 0;
+            document.getElementById('stat-winrate').textContent = `${winRate.toFixed(1)}%`;
+            document.getElementById('stat-calcs').textContent = `(${stats.totalCalculations} trades)`;
+            document.getElementById('winrate-bar').style.width = `${winRate}%`;
+
             document.getElementById('stat-profit').textContent = `₹${stats.totalProfit.toFixed(2)}`;
             document.getElementById('stat-loss').textContent = `₹${stats.totalLoss.toFixed(2)}`;
             document.getElementById('stat-top-stock').textContent = stats.topStockName;
@@ -35,13 +52,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             renderDoughnutChart(stats.totalProfit, stats.totalLoss);
             
-            // Fetch history for trend chart
+            // Fetch history for trend chart and activity feed
             const histRes = await fetch(`/api/calculations/history/${userId}`);
-            const history = await histRes.json();
-            renderLineChart(history);
+            fullHistoryData = await histRes.json();
+            renderLineChart(fullHistoryData);
+            renderActivityFeed(fullHistoryData);
 
         } catch (err) {
             console.error('Failed to load dashboard stats', err);
+            if(window.showToast) showToast('Failed to load dashboard stats', 'error');
         }
     }
 
@@ -127,9 +146,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function renderActivityFeed(history) {
+        const feed = document.getElementById('activity-feed');
+        feed.innerHTML = '';
+
+        if (!history || history.length === 0) {
+            feed.innerHTML = '<p style="text-align: center; opacity: 0.6; margin-top: 2rem;">No recent activity.</p>';
+            return;
+        }
+
+        // Show only the 5 most recent trades (assuming history is chronological, we reverse it to show newest first)
+        const recentTrades = [...history].reverse().slice(0, 5);
+
+        recentTrades.forEach(trade => {
+            const isProfit = trade.profit >= 0;
+            const sign = isProfit ? '+' : '';
+            const type = isProfit ? 'profit' : 'loss';
+            const icon = isProfit ? '✓' : '✗';
+            const color = isProfit ? 'var(--accent-color)' : 'var(--danger-color)';
+
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.innerHTML = `
+                <div class="activity-dot ${type}">${icon}</div>
+                <div class="activity-content">
+                    <div class="activity-title" style="display: flex; justify-content: space-between;">
+                        <span>Traded ${trade.stockName}</span>
+                        <span style="color: ${color};">${sign}₹${Math.abs(trade.profit).toFixed(2)}</span>
+                    </div>
+                    <div class="activity-meta">
+                        Bought at ₹${trade.buyPrice} • Sold at ₹${trade.sellPrice} • Qty: ${trade.quantity}
+                    </div>
+                </div>
+            `;
+            feed.appendChild(item);
+        });
+    }
+
     // Re-render charts on theme change to update text colors
     window.addEventListener('themeChanged', () => {
         fetchStats();
+    });
+
+    // Setup chart filters
+    const filterBtns = document.querySelectorAll('.chart-filters button');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Update active state
+            filterBtns.forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline');
+            });
+            e.target.classList.remove('btn-outline');
+            e.target.classList.add('btn-primary');
+
+            // Filter data (mock time filtering by slicing latest trades)
+            const type = e.target.textContent;
+            let filteredData = [...fullHistoryData];
+            
+            if (type === '1W') {
+                // Mock 1 week = last 5 trades
+                filteredData = filteredData.slice(0, 5);
+            } else if (type === '1M') {
+                // Mock 1 month = last 20 trades
+                filteredData = filteredData.slice(0, 20);
+            }
+            
+            renderLineChart(filteredData);
+        });
     });
 
     fetchStats();

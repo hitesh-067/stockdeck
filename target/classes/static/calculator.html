@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator - StockDeck</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
-    <nav>
+    <nav class="topbar">
         <a href="dashboard.html" class="brand">StockDeck</a>
         <div class="links" style="display: flex; align-items: center;">
             <button id="theme-toggle" class="theme-toggle">☀️</button>
         </div>
     </nav>
 
-    <div class="dashboard">
-        <aside class="glass-panel sidebar">
+    <div class="app-container">
+        <aside class="sidebar">
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="calculator.html" class="active">Calculator</a></li>
@@ -25,12 +25,12 @@
             </ul>
         </aside>
 
-        <main class="main-content">
-            <h2 style="margin-bottom: 1.5rem;">Profit / Loss Calculator</h2>
-            
-            <div class="glass-panel form-container" style="margin: 0; max-width: 600px;">
-                <div id="alertBox" class="alert"></div>
-                <form id="calcForm">
+        <main class="main-content" style="align-items: center;">
+            <div style="width: 100%; max-width: 600px;">
+                <h2 style="margin-bottom: 2rem;">Profit / Loss Calculator</h2>
+                
+                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px;">
+                    <form id="calcForm">
                     <div class="form-group">
                         <label for="stockName">Stock Name</label>
                         <input type="text" id="stockName" required>
@@ -50,18 +50,44 @@
                     <button type="submit" class="btn btn-primary">Calculate & Save</button>
                 </form>
 
-                <div id="resultBox" style="margin-top: 2rem; display: none;">
-                    <h3>Result</h3>
-                    <p style="font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem;" id="calcResultText"></p>
+                    <div id="resultBox" style="margin-top: 2rem; display: none; padding-top: 1.5rem; border-top: 1px solid var(--card-border); text-align: center;">
+                        <h3 style="opacity: 0.8; font-size: 0.95rem;">Result</h3>
+                        <p style="font-size: 1.8rem; font-weight: 700; margin-top: 0.5rem;" id="calcResultText"></p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
     <script src="js/theme.js"></script>
+    <script src="js/toast.js"></script>
     <script>
         const userId = localStorage.getItem('userId');
         if (!userId) window.location.href = 'login.html';
+
+        // Live Price Fetching
+        document.getElementById('stockName').addEventListener('blur', async (e) => {
+            const ticker = e.target.value.trim();
+            if (!ticker) return;
+            
+            const buyPriceInput = document.getElementById('buyPrice');
+            buyPriceInput.classList.add('skeleton'); // Show skeleton loader
+            
+            try {
+                const res = await fetch(`/api/stock/quote/${ticker}`);
+                const data = await res.json();
+                if (res.ok && data.price) {
+                    buyPriceInput.value = parseFloat(data.price).toFixed(2);
+                    showToast(`Live price fetched for ${data.symbol}`, 'success');
+                } else {
+                    showToast('Could not fetch live price, please enter manually.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                buyPriceInput.classList.remove('skeleton'); // Remove skeleton loader
+            }
+        });
 
         document.getElementById('calcForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -69,7 +95,6 @@
             const buyPrice = parseFloat(document.getElementById('buyPrice').value);
             const sellPrice = parseFloat(document.getElementById('sellPrice').value);
             const quantity = parseInt(document.getElementById('quantity').value);
-            const alertBox = document.getElementById('alertBox');
             const resultBox = document.getElementById('resultBox');
             const calcResultText = document.getElementById('calcResultText');
 
@@ -83,8 +108,7 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    alertBox.className = 'alert success';
-                    alertBox.textContent = 'Calculation saved successfully!';
+                    showToast('Calculation saved successfully!', 'success');
                     
                     resultBox.style.display = 'block';
                     if (data.profit >= 0) {
@@ -97,12 +121,10 @@
                     
                     document.getElementById('calcForm').reset();
                 } else {
-                    alertBox.className = 'alert error';
-                    alertBox.textContent = data.error || 'Failed to save calculation.';
+                    showToast(data.error || 'Failed to save calculation.', 'error');
                 }
             } catch (err) {
-                alertBox.className = 'alert error';
-                alertBox.textContent = 'Server error. Please try again.';
+                showToast('Server error. Please try again.', 'error');
             }
         });
     </script>
