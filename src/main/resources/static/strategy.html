@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strategy Analyzer - StockDeck</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -48,108 +48,169 @@
         <main class="main-content" style="position: relative; overflow: hidden;">
             <div class="ambient-glow"></div>
             
-            <div style="margin-bottom: 2rem;">
-                <h2 style="display: flex; align-items: center; gap: 0.5rem; font-size: 2rem;">
-                    Algorithmic Trading Simulator
-                </h2>
-                <p style="color: var(--text-color); opacity: 0.8; font-size: 1.1rem; max-width: 600px;">
-                    Backtest strategies against 30 days of real market data to find the maximum possible profit.
-                </p>
+            <!-- Page Header with Gradient Accent -->
+            <div class="strategy-page-header">
+                <div class="strategy-header-content">
+                    <div class="strategy-header-badge">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Powered by Real-Time Data
+                    </div>
+                    <h2 class="strategy-title">
+                        <span class="text-gradient">Algorithmic</span> Trading Simulator
+                    </h2>
+                    <p class="strategy-subtitle">
+                        Backtest strategies against 30 days of real market data to find the maximum possible profit.
+                    </p>
+                </div>
             </div>
             
-            <div class="charts-grid" style="grid-template-columns: 1fr 1fr;">
-                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px;">
-                    <h3 style="margin-bottom: 1rem;">Input Price Sequence</h3>
+            <!-- Main Content Grid -->
+            <div class="strategy-grid">
+                <!-- Left Panel: Input Form -->
+                <div class="strategy-input-panel glass-panel">
+                    <div class="strategy-panel-header">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        <h3>Configure Analysis</h3>
+                    </div>
+
                     <div id="alertBox" class="alert"></div>
                     
+                    <!-- Segmented Control -->
                     <div class="segmented-control">
                         <div class="segment-highlight" id="segment-highlight"></div>
-                        <button id="modeLiveBtn" class="segmented-btn active">Live Ticker (Pro)</button>
-                        <button id="modeManualBtn" class="segmented-btn">Manual Input</button>
+                        <button id="modeLiveBtn" class="segmented-btn active">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Live Ticker
+                        </button>
+                        <button id="modeManualBtn" class="segmented-btn">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Manual Input
+                        </button>
                     </div>
 
                     <form id="strategyForm">
                         <div class="form-group" id="inputLive">
-                            <label for="ticker">Stock Ticker</label>
-                            <input type="text" id="ticker" placeholder="e.g. AAPL, TSLA" style="text-transform: uppercase;">
+                            <label for="ticker">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                Stock Ticker
+                            </label>
+                            <input type="text" id="ticker" placeholder="E.G. AAPL, TSLA, MSFT" style="text-transform: uppercase;">
                         </div>
                         <div class="form-group" id="inputManual" style="display: none;">
-                            <label for="prices">Enter Prices (comma separated)</label>
+                            <label for="prices">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                Enter Prices (comma separated)
+                            </label>
                             <input type="text" id="prices" placeholder="e.g. 7, 1, 5, 3, 6, 4, 8, 2, 10">
                         </div>
                         
                         <div class="form-group">
-                            <label for="algorithm">Select Algorithm</label>
-                            <select id="algorithm" style="width: 100%; padding: 0.85rem; border-radius: 8px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
+                            <label for="algorithm">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                Select Algorithm
+                            </label>
+                            <select id="algorithm" style="width: 100%; padding: 0.85rem; border-radius: 10px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none; cursor: pointer;">
                                 <option value="single">Single Trade (Find Max Profit)</option>
                                 <option value="multiple">Multiple Trades (Peak & Valley)</option>
                             </select>
                         </div>
                         
-                        <button type="submit" id="analyzeBtn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">Run Analysis</button>
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary strategy-run-btn">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Run Analysis
+                        </button>
                     </form>
                 </div>
                 
-                <!-- Right Side: Placeholder Instructions (Shows initially) -->
-                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" id="placeholderSection">
-                    <svg style="width: 64px; height: 64px; color: var(--primary-color); opacity: 0.8; margin-bottom: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Awaiting Instructions</h3>
-                    <p style="opacity: 0.7; max-width: 300px; margin-bottom: 2rem; line-height: 1.6;">
-                        Select an algorithm on the left and enter a stock ticker to simulate trading over the last 30 days.
-                    </p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; text-align: left;">
-                        <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
-                            <div style="color: var(--primary-color); font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem;">Single Trade</div>
-                            <p style="font-size: 0.85rem; opacity: 0.7; margin: 0; line-height: 1.4;">Finds the single best buy/sell day for maximum net return.</p>
+                <!-- Right Panel: Placeholder / Results -->
+                <div class="strategy-output-panel glass-panel" id="placeholderSection">
+                    <div class="strategy-placeholder">
+                        <div class="strategy-placeholder-icon">
+                            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                         </div>
-                        <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
-                            <div style="color: var(--accent-color); font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem;">Peak & Valley</div>
-                            <p style="font-size: 0.85rem; opacity: 0.7; margin: 0; line-height: 1.4;">Captures every upward trend across multiple trades.</p>
+                        <h3>Awaiting Instructions</h3>
+                        <p>Select an algorithm and enter a stock ticker to simulate trading over the last 30 days.</p>
+                        
+                        <div class="strategy-algo-cards">
+                            <div class="strategy-algo-card strategy-algo-single">
+                                <div class="strategy-algo-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-color);">
+                                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                                <div class="strategy-algo-info">
+                                    <h4>Single Trade</h4>
+                                    <p>Finds the single best buy/sell day for maximum net return.</p>
+                                </div>
+                            </div>
+                            <div class="strategy-algo-card strategy-algo-multi">
+                                <div class="strategy-algo-icon" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">
+                                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                                </div>
+                                <div class="strategy-algo-info">
+                                    <h4>Peak & Valley</h4>
+                                    <p>Captures every upward trend across multiple trades.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side: Results (Hidden initially) -->
-                <div class="glass-panel" style="padding: 2.5rem; border-radius: 20px; display: none;" id="resultSection">
-                    <h3 style="margin-bottom: 0.5rem; text-align: center;">Results & Recommendation</h3>
-                    <p id="nl-summary" style="text-align: center; color: var(--accent-color); font-weight: 500; margin-bottom: 2rem; font-size: 1.05rem;">
-                        <!-- Filled by JS -->
-                    </p>
-                    
-                    <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; text-align: center; flex-wrap: wrap; gap: 1rem;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">BUY SIGNAL</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-color);" id="resBuy">Day -</div>
+                <!-- Right Panel: Results (Hidden initially) -->
+                <div class="strategy-output-panel glass-panel" style="display: none;" id="resultSection">
+                    <div class="strategy-results">
+                        <div class="strategy-results-header">
+                            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            <h3>Analysis Results</h3>
                         </div>
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">SELL SIGNAL</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger-color);" id="resSell">Day -</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">MAXIMUM PROFIT</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);" id="resProfit">₹0</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">ESTIMATED ROI</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #a855f7;" id="resROI">0%</div>
+                        <p id="nl-summary" class="strategy-summary-text"></p>
+                        
+                        <div class="strategy-metrics-grid">
+                            <div class="strategy-metric-card strategy-metric-buy">
+                                <div class="strategy-metric-label">BUY SIGNAL</div>
+                                <div class="strategy-metric-value" id="resBuy">Day -</div>
+                                <div class="strategy-metric-bar" style="background: var(--accent-color);"></div>
+                            </div>
+                            <div class="strategy-metric-card strategy-metric-sell">
+                                <div class="strategy-metric-label">SELL SIGNAL</div>
+                                <div class="strategy-metric-value" id="resSell">Day -</div>
+                                <div class="strategy-metric-bar" style="background: var(--danger-color);"></div>
+                            </div>
+                            <div class="strategy-metric-card strategy-metric-profit">
+                                <div class="strategy-metric-label">MAX PROFIT</div>
+                                <div class="strategy-metric-value" id="resProfit">₹0</div>
+                                <div class="strategy-metric-bar" style="background: var(--primary-color);"></div>
+                            </div>
+                            <div class="strategy-metric-card strategy-metric-roi">
+                                <div class="strategy-metric-label">EST. ROI</div>
+                                <div class="strategy-metric-value" id="resROI">0%</div>
+                                <div class="strategy-metric-bar" style="background: #a855f7;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Professional Interactive Chart Section -->
-            <div id="chartSection" class="glass-panel" style="margin-top: 2rem; padding: 2rem; border-radius: 20px; display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div id="chartSection" class="glass-panel strategy-chart-section" style="display: none;">
+                <div class="strategy-chart-header">
                     <div>
-                        <h3 style="margin: 0; font-size: 1.25rem;">Price Action Analysis</h3>
-                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.6; margin-top: 0.25rem;">Interactive visualization of identified trading signals</p>
+                        <h3>
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:6px;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                            Price Action Analysis
+                        </h3>
+                        <p>Interactive visualization of identified trading signals</p>
                     </div>
-                    <div style="display: flex; gap: 1rem; font-size: 0.85rem; opacity: 0.8;">
-                        <span style="display: flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 8px var(--accent-color);"></span> Buy Signal</span>
-                        <span style="display: flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--danger-color); box-shadow: 0 0 8px var(--danger-color);"></span> Sell Signal</span>
+                    <div class="strategy-chart-legend">
+                        <span class="strategy-legend-item">
+                            <span class="strategy-legend-dot" style="background: var(--accent-color); box-shadow: 0 0 8px var(--accent-color);"></span>
+                            Buy Signal
+                        </span>
+                        <span class="strategy-legend-item">
+                            <span class="strategy-legend-dot" style="background: var(--danger-color); box-shadow: 0 0 8px var(--danger-color);"></span>
+                            Sell Signal
+                        </span>
                     </div>
                 </div>
-                <div style="height: 400px; position: relative; width: 100%;">
+                <div class="strategy-chart-canvas-wrapper">
                     <canvas id="strategyChart"></canvas>
                 </div>
             </div>
