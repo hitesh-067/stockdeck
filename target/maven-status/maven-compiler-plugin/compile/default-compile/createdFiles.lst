@@ -1,4 +1,5 @@
 com\stockdeck\service\CalculationService.class
+com\stockdeck\controller\HealthController.class
 com\stockdeck\dto\LoginRequest.class
 com\stockdeck\StockdeckApplication.class
 com\stockdeck\controller\AuthController.class

@@ -28,7 +28,6 @@
                 <li><a href="calculator.html">Calculator</a></li>
                 <li><a href="history.html" class="active">History</a></li>
                 <li><a href="strategy.html">Strategy Analyzer</a></li>
-                <li><a href="profile.html">⚙️ Profile Settings</a></li>
                 <li style="margin-top: 1rem;">
                     <a href="#" onclick="localStorage.clear(); window.location.href='login.html'; return false;" style="color: var(--danger-color); display: flex; align-items: center; gap: 0.5rem; font-weight: 500;">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> 
@@ -202,30 +201,41 @@
             if (!dataTable) return;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
+
             // Header
             doc.setFontSize(22);
-            doc.setTextColor(59, 130, 246); // Primary Color
+            doc.setTextColor(59, 130, 246);
             doc.text('StockDeck', 14, 20);
-            
-            doc.setFontSize(14);
-            doc.setTextColor(0, 0, 0);
-            doc.text('Transaction History Report', 14, 30);
-            
-            const date = new Date().toLocaleDateString();
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text(`Generated on: ${date}`, 14, 37);
 
-            // Table
-            const head = [['Stock Name', 'Buy Price', 'Sell Price', 'Quantity', 'Profit/Loss']];
+            doc.setFontSize(14);
+            doc.setTextColor(30, 30, 30);
+            doc.text('Transaction History Report', 14, 30);
+
+            const date = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+            doc.setFontSize(10);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Generated on: ' + date, 14, 37);
+
+            // Build table body from raw API data stored on each <tr>
+            // We read directly from the DataTables API using node() to get the raw values
+            const head = [['Stock Name', 'Buy Price (Rs.)', 'Sell Price (Rs.)', 'Quantity', 'Profit / Loss (Rs.)']];
             const body = [];
-            
-            dataTable.rows().data().toArray().forEach(row => {
-                const cleanRow = row.slice(0, 5).map(cell => {
-                    return $('<div>').html(cell).text();
-                });
-                body.push(cleanRow);
+            const profitValues = []; // store raw profit numbers for color coding
+
+            dataTable.rows().every(function() {
+                const rowNode = this.node();
+                const cells = rowNode.querySelectorAll('td');
+                // cells[0]=stock, [1]=buyPrice, [2]=sellPrice, [3]=qty, [4]=profit, [5]=action
+                const stockName  = cells[0].textContent.trim();
+                const buyPrice   = cells[1].textContent.trim().replace(/[\u20B9]/g, 'Rs. ');
+                const sellPrice  = cells[2].textContent.trim().replace(/[\u20B9]/g, 'Rs. ');
+                const qty        = cells[3].textContent.trim();
+                // Use data-order attribute for the raw numeric profit value
+                const rawProfit  = parseFloat(cells[4].getAttribute('data-order') || '0');
+                const profitText = 'Rs. ' + Math.abs(rawProfit).toFixed(2) + (rawProfit < 0 ? ' (Loss)' : ' (Profit)');
+
+                body.push([stockName, buyPrice, sellPrice, qty, profitText]);
+                profitValues.push(rawProfit);
             });
 
             doc.autoTable({
@@ -233,23 +243,42 @@
                 body: body,
                 startY: 45,
                 theme: 'striped',
-                headStyles: { fillColor: [59, 130, 246] },
+                styles: { font: 'helvetica', fontSize: 10 },
+                headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+                alternateRowStyles: { fillColor: [245, 248, 255] },
                 didParseCell: function(data) {
-                    // Color code Profit/Loss column (index 4)
                     if (data.section === 'body' && data.column.index === 4) {
-                        const val = parseFloat(data.cell.raw.replace(/[^0-9.-]+/g,""));
+                        const val = profitValues[data.row.index];
                         if (val > 0) {
                             data.cell.styles.textColor = [16, 185, 129]; // Green
+                            data.cell.styles.fontStyle = 'bold';
                         } else if (val < 0) {
-                            data.cell.styles.textColor = [239, 68, 68]; // Red
+                            data.cell.styles.textColor = [220, 38, 38];  // Red
+                            data.cell.styles.fontStyle = 'bold';
                         }
                     }
                 }
             });
-            
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(160, 160, 160);
+                doc.text('StockDeck - Confidential Report | Page ' + i + ' of ' + pageCount,
+                    doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 8,
+                    { align: 'center' });
+            }
+
             doc.save('StockDeck_History_Report.pdf');
-            showToast('Exported to PDF!', 'success');
+            showToast('PDF exported successfully!', 'success');
         });
+
+        // Keep Render warm: ping the server every 10 minutes so the free-tier doesn't spin down
+        setInterval(() => {
+            fetch('/api/ping').catch(() => {}); // silent fail
+        }, 10 * 60 * 1000);
 
         fetchHistory();
     </script>
