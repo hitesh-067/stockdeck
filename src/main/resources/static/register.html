@@ -63,9 +63,13 @@
                 const data = await res.json();
                 
                 if (res.ok) {
+                    // Auto-login after registration
+                    localStorage.setItem('userId', data.userId);
+                    localStorage.setItem('username', username);
+                    
                     alertBox.className = 'alert success';
-                    alertBox.textContent = 'Registration successful! Redirecting to login...';
-                    setTimeout(() => window.location.href = 'login.html', 1500);
+                    alertBox.textContent = 'Account created! Heading to dashboard...';
+                    setTimeout(() => window.location.href = 'dashboard.html', 1000);
                 } else {
                     alertBox.className = 'alert error';
                     alertBox.textContent = data.error || 'Registration failed.';
